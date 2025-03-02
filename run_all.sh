@@ -2,7 +2,7 @@
 
 set -ev
 
-export CUDA_VISIBLE_DEVICES=0
+export CUDA_VISIBLE_DEVICES=7
 # for libtorch_python.so
 export LD_LIBRARY_PATH=$(dirname $(python -c 'import torch; print(torch.__file__)'))/lib/
 
