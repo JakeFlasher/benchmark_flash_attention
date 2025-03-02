@@ -34,7 +34,7 @@ FetchContent_MakeAvailable(fmt)
 FetchContent_Declare(
   nvbench
   GIT_REPOSITORY https://github.com/NVIDIA/nvbench.git
-  GIT_TAG d8dced8a64d9ce305add92fa6d274fd49b569b7e
+    GIT_TAG d8dced8a64d9ce305add92fa6d274fd49b569b7e
   EXCLUDE_FROM_ALL
 )
 set(NVBENCH_USE_SYSTEM_FMT OFF CACHE BOOL "Don't use system fmt" FORCE)

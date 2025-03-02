@@ -1,9 +1,12 @@
 
 export CUDA_VISIBLE_DEVICES=7
-# for libtorch_python.so
 export LD_LIBRARY_PATH=$(dirname $(python -c 'import torch; print(torch.__file__)'))/lib/
 
-S=64 Hqo=64 Hkv=8  D=128 P=256 && ./build/flash_attention_benchmark -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P --disable-blocking-kernel --md "benchmark-$S-GQA$(( $Hqo / $Hkv ))-$P-$Hqo-$Hkv-$D.md"
+# Model size test cases
+# Llama 2 7B-like (32 heads, 128 dim)
+S=1 Hqo=32 Hkv=32 D=128 P=256 && ./build/flash_attention_benchmark \
+  -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P \
+  --disable-blocking-kernel --md "results/benchmark-llama2-7b-$S.md"
 # Devices
 
 ## [0] `NVIDIA A30`
@@ -22,30 +25,26 @@ S=64 Hqo=64 Hkv=8  D=128 P=256 && ./build/flash_attention_benchmark -a num_seqs=
 # Log
 
 ```
-Run:  [1/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=32 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.048044ms GPU, 0.055233ms CPU, 0.50s total GPU, 1.07s total wall, 10416x 
-Run:  [2/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=64 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.052546ms GPU, 0.059746ms CPU, 0.50s total GPU, 1.00s total wall, 9520x 
-Run:  [3/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=128 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.071672ms GPU, 0.078311ms CPU, 0.50s total GPU, 0.86s total wall, 6992x 
-Run:  [4/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=256 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.114139ms GPU, 0.121422ms CPU, 0.50s total GPU, 0.71s total wall, 4384x 
-Run:  [5/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=512 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.193475ms GPU, 0.200825ms CPU, 0.50s total GPU, 0.63s total wall, 2592x 
-Run:  [6/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=1024 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.347112ms GPU, 0.360893ms CPU, 0.57s total GPU, 0.66s total wall, 1648x 
-Run:  [7/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=2048 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.650797ms GPU, 0.657542ms CPU, 0.50s total GPU, 0.54s total wall, 769x 
-Run:  [8/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=4096 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 1.260890ms GPU, 1.269517ms CPU, 0.50s total GPU, 0.52s total wall, 397x 
-Run:  [9/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=8192 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 2.484199ms GPU, 2.491379ms CPU, 0.50s total GPU, 0.51s total wall, 202x 
-Run:  [10/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=16384 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 4.930962ms GPU, 4.938799ms CPU, 0.50s total GPU, 0.51s total wall, 102x 
-Run:  [11/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=32768 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Skip: seq_len too long to fit into the benchmark preset
-Run:  [12/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=65536 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Skip: seq_len too long to fit into the benchmark preset
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=32 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.024662ms GPU, 0.031768ms CPU, 0.50s total GPU, 1.84s total wall, 20288x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=64 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.024552ms GPU, 0.031323ms CPU, 0.50s total GPU, 1.78s total wall, 20368x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=128 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.026172ms GPU, 0.033120ms CPU, 0.50s total GPU, 1.71s total wall, 19120x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=256 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.030392ms GPU, 0.037201ms CPU, 0.50s total GPU, 1.51s total wall, 16464x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.038570ms GPU, 0.045923ms CPU, 0.50s total GPU, 1.28s total wall, 12976x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.055927ms GPU, 0.062553ms CPU, 0.50s total GPU, 1.01s total wall, 8944x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.083898ms GPU, 0.090475ms CPU, 0.50s total GPU, 0.83s total wall, 5968x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.129222ms GPU, 0.138639ms CPU, 0.50s total GPU, 0.72s total wall, 3872x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.219596ms GPU, 0.226772ms CPU, 0.50s total GPU, 0.63s total wall, 2288x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=16384 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.401016ms GPU, 0.408744ms CPU, 0.50s total GPU, 0.57s total wall, 1247x 
 ```
 
 # Benchmark Results
@@ -54,19 +53,23 @@ Skip: seq_len too long to fit into the benchmark preset
 
 ### [0] NVIDIA A30
 
-| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size |    Read     |   Write   | Samples |  CPU Time  | Noise  |  GPU Time  | Noise  | GlobalMem BW | BWUtil |
-|----------|---------|-----------|--------------|-----------|-----------|-------------|-----------|---------|------------|--------|------------|--------|--------------|--------|
-|       64 |      32 |        64 |            8 |       128 |       256 |   9.000 MiB | 1.000 MiB |  10416x |  55.233 us | 62.05% |  48.044 us | 12.69% | 218.252 GB/s | 23.39% |
-|       64 |      64 |        64 |            8 |       128 |       256 |  17.000 MiB | 1.000 MiB |   9520x |  59.746 us | 54.14% |  52.546 us |  1.60% | 359.200 GB/s | 38.49% |
-|       64 |     128 |        64 |            8 |       128 |       256 |  33.000 MiB | 1.000 MiB |   6992x |  78.311 us |  9.35% |  71.672 us |  1.42% | 497.425 GB/s | 53.31% |
-|       64 |     256 |        64 |            8 |       128 |       256 |  65.000 MiB | 1.000 MiB |   4384x | 121.422 us | 29.10% | 114.139 us |  0.94% | 606.332 GB/s | 64.98% |
-|       64 |     512 |        64 |            8 |       128 |       256 | 129.000 MiB | 1.000 MiB |   2592x | 200.825 us | 18.06% | 193.475 us |  0.78% | 704.562 GB/s | 75.51% |
-|       64 |    1024 |        64 |            8 |       128 |       256 | 257.000 MiB | 1.000 MiB |   1648x | 360.893 us | 71.91% | 347.112 us |  0.69% | 779.382 GB/s | 83.52% |
-|       64 |    2048 |        64 |            8 |       128 |       256 | 513.000 MiB | 1.000 MiB |    769x | 657.542 us |  1.09% | 650.797 us |  0.33% | 828.167 GB/s | 88.75% |
-|       64 |    4096 |        64 |            8 |       128 |       256 |   1.001 GiB | 1.000 MiB |    397x |   1.270 ms |  3.00% |   1.261 ms |  0.26% | 853.238 GB/s | 91.44% |
-|       64 |    8192 |        64 |            8 |       128 |       256 |   2.001 GiB | 1.000 MiB |    202x |   2.491 ms |  0.37% |   2.484 ms |  0.15% | 865.301 GB/s | 92.73% |
-|       64 |   16384 |        64 |            8 |       128 |       256 |   4.001 GiB | 1.000 MiB |    102x |   4.939 ms |  0.29% |   4.931 ms |  0.11% | 871.446 GB/s | 93.39% |
-S=64 Hqo=32 Hkv=8  D=128 P=256 && ./build/flash_attention_benchmark -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P --disable-blocking-kernel --md "benchmark-$S-GQA$(( $Hqo / $Hkv ))-$P-$Hqo-$Hkv-$D.md"
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  |  Noise  |  GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|---------|------------|--------|---------|--------------|--------|
+|        1 |      32 |        32 |           32 |       128 |       256 |  520.000 KiB |     8.000 KiB |        16384 |     32 |  20288x |  31.768 us |  62.64% |  24.662 us |  8.53% |  1.298M |  21.923 GB/s |  2.35% |
+|        1 |      64 |        32 |           32 |       128 |       256 |    1.008 MiB |     8.000 KiB |        16384 |     64 |  20368x |  31.323 us |  60.81% |  24.552 us | 53.90% |  2.607M |  43.375 GB/s |  4.65% |
+|        1 |     128 |        32 |           32 |       128 |       256 |    2.008 MiB |     8.000 KiB |        16384 |    128 |  19120x |  33.120 us |  92.05% |  26.172 us |  3.91% |  4.891M |  80.757 GB/s |  8.65% |
+|        1 |     256 |        32 |           32 |       128 |       256 |    4.008 MiB |     8.000 KiB |        16384 |    256 |  16464x |  37.201 us |  43.67% |  30.392 us |  2.66% |  8.423M | 138.546 GB/s | 14.85% |
+|        1 |     512 |        32 |           32 |       128 |       256 |    8.008 MiB |     8.000 KiB |        16384 |    512 |  12976x |  45.923 us | 218.36% |  38.570 us |  3.27% | 13.274M | 217.914 GB/s | 23.35% |
+|        1 |    1024 |        32 |           32 |       128 |       256 |   16.008 MiB |     8.000 KiB |        16384 |   1024 |   8944x |  62.553 us |  11.95% |  55.927 us |  1.70% | 18.310M | 300.277 GB/s | 32.18% |
+|        1 |    2048 |        32 |           32 |       128 |       256 |   32.008 MiB |     8.000 KiB |        16384 |   2048 |   5968x |  90.475 us |   7.95% |  83.898 us |  1.43% | 24.411M | 400.138 GB/s | 42.88% |
+|        1 |    4096 |        32 |           32 |       128 |       256 |   64.008 MiB |     8.000 KiB |        16384 |   4096 |   3872x | 138.639 us | 106.47% | 129.222 us |  2.61% | 31.697M | 519.459 GB/s | 55.67% |
+|        1 |    8192 |        32 |           32 |       128 |       256 |  128.008 MiB |     8.000 KiB |        16384 |   8192 |   2288x | 226.772 us |  13.66% | 219.596 us |  0.63% | 37.305M | 611.279 GB/s | 65.51% |
+|        1 |   16384 |        32 |           32 |       128 |       256 |  256.008 MiB |     8.000 KiB |        16384 |  16384 |   1247x | 408.744 us |  10.14% | 401.016 us |  0.42% | 40.856M | 669.429 GB/s | 71.74% |
+
+# Llama 2 70B-like (64 heads, heads_size=128) with GQA(8)
+S=1 Hqo=64 Hkv=8 D=128 P=256 && ./build/flash_attention_benchmark \
+  -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P \
+  --disable-blocking-kernel --md "results/benchmark-llama2-70b-gqa8-$S.md"
 # Devices
 
 ## [0] `NVIDIA A30`
@@ -85,30 +88,26 @@ S=64 Hqo=32 Hkv=8  D=128 P=256 && ./build/flash_attention_benchmark -a num_seqs=
 # Log
 
 ```
-Run:  [1/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=32 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.047083ms GPU, 0.054905ms CPU, 0.50s total GPU, 1.08s total wall, 10624x 
-Run:  [2/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=64 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.050766ms GPU, 0.058317ms CPU, 0.50s total GPU, 1.01s total wall, 9856x 
-Run:  [3/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=128 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.070194ms GPU, 0.077805ms CPU, 0.53s total GPU, 0.92s total wall, 7568x 
-Run:  [4/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=256 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.112256ms GPU, 0.120978ms CPU, 0.50s total GPU, 0.73s total wall, 4464x 
-Run:  [5/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=512 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.190933ms GPU, 0.202639ms CPU, 0.50s total GPU, 0.64s total wall, 2624x 
-Run:  [6/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.344139ms GPU, 0.354131ms CPU, 0.50s total GPU, 0.57s total wall, 1453x 
-Run:  [7/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=2048 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.647459ms GPU, 0.668905ms CPU, 0.50s total GPU, 0.55s total wall, 773x 
-Run:  [8/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=4096 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 1.257341ms GPU, 1.265364ms CPU, 0.50s total GPU, 0.52s total wall, 398x 
-Run:  [9/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=8192 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 2.479535ms GPU, 2.486453ms CPU, 0.50s total GPU, 0.51s total wall, 202x 
-Run:  [10/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=16384 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 4.925570ms GPU, 5.030266ms CPU, 0.50s total GPU, 0.52s total wall, 102x 
-Run:  [11/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Skip: seq_len too long to fit into the benchmark preset
-Run:  [12/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=65536 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Skip: seq_len too long to fit into the benchmark preset
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=32 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.027452ms GPU, 0.034546ms CPU, 0.50s total GPU, 1.56s total wall, 18224x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=64 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.026784ms GPU, 0.033677ms CPU, 0.50s total GPU, 1.56s total wall, 18672x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=128 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.027579ms GPU, 0.034341ms CPU, 0.50s total GPU, 1.55s total wall, 18144x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=256 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.031181ms GPU, 0.038397ms CPU, 0.50s total GPU, 1.40s total wall, 16048x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.036106ms GPU, 0.042907ms CPU, 0.50s total GPU, 1.25s total wall, 13856x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.047183ms GPU, 0.054000ms CPU, 0.50s total GPU, 1.06s total wall, 10608x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.069445ms GPU, 0.076459ms CPU, 0.50s total GPU, 0.87s total wall, 7200x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.116158ms GPU, 0.123136ms CPU, 0.50s total GPU, 0.71s total wall, 4320x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.206324ms GPU, 0.213440ms CPU, 0.50s total GPU, 0.61s total wall, 2424x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=16384 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.382225ms GPU, 0.391139ms CPU, 0.50s total GPU, 0.56s total wall, 1309x 
 ```
 
 # Benchmark Results
@@ -117,19 +116,23 @@ Skip: seq_len too long to fit into the benchmark preset
 
 ### [0] NVIDIA A30
 
-| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size |    Read     |    Write    | Samples |  CPU Time  |  Noise  |  GPU Time  | Noise  | GlobalMem BW | BWUtil |
-|----------|---------|-----------|--------------|-----------|-----------|-------------|-------------|---------|------------|---------|------------|--------|--------------|--------|
-|       64 |      32 |        32 |            8 |       128 |       256 |   8.500 MiB | 512.000 KiB |  10624x |  54.905 us |  97.99% |  47.083 us | 11.91% | 200.438 GB/s | 21.48% |
-|       64 |      64 |        32 |            8 |       128 |       256 |  16.500 MiB | 512.000 KiB |   9856x |  58.317 us |  89.61% |  50.766 us |  4.79% | 351.139 GB/s | 37.63% |
-|       64 |     128 |        32 |            8 |       128 |       256 |  32.500 MiB | 512.000 KiB |   7568x |  77.805 us |  57.80% |  70.194 us |  1.21% | 492.959 GB/s | 52.83% |
-|       64 |     256 |        32 |            8 |       128 |       256 |  64.500 MiB | 512.000 KiB |   4464x | 120.978 us | 116.03% | 112.256 us |  1.59% | 607.161 GB/s | 65.07% |
-|       64 |     512 |        32 |            8 |       128 |       256 | 128.500 MiB | 512.000 KiB |   2624x | 202.639 us |  95.40% | 190.933 us |  0.80% | 708.449 GB/s | 75.92% |
-|       64 |    1024 |        32 |            8 |       128 |       256 | 256.500 MiB | 512.000 KiB |   1453x | 354.131 us |  19.53% | 344.139 us |  0.49% | 783.068 GB/s | 83.92% |
-|       64 |    2048 |        32 |            8 |       128 |       256 | 512.500 MiB | 512.000 KiB |    773x | 668.905 us |  50.93% | 647.459 us |  0.37% | 830.816 GB/s | 89.04% |
-|       64 |    4096 |        32 |            8 |       128 |       256 |   1.000 GiB | 512.000 KiB |    398x |   1.265 ms |   2.23% |   1.257 ms |  0.24% | 854.812 GB/s | 91.61% |
-|       64 |    8192 |        32 |            8 |       128 |       256 |   2.000 GiB | 512.000 KiB |    202x |   2.486 ms |   0.33% |   2.480 ms |  0.18% | 866.506 GB/s | 92.86% |
-|       64 |   16384 |        32 |            8 |       128 |       256 |   4.000 GiB | 512.000 KiB |    102x |   5.030 ms |  18.56% |   4.926 ms |  0.15% | 872.186 GB/s | 93.47% |
-S=64 Hqo=32 Hkv=32 D=128 P=256 && ./build/flash_attention_benchmark -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P --disable-blocking-kernel --md "benchmark-$S-GQA$(( $Hqo / $Hkv ))-$P-$Hqo-$Hkv-$D.md"
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  |  Noise  |  GPU Time  |  Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|---------|------------|---------|---------|--------------|--------|
+|        1 |      32 |        64 |            8 |       128 |       256 |  144.000 KiB |    16.000 KiB |         4096 |     32 |  18224x |  34.546 us |  77.64% |  27.452 us |  10.63% |  1.166M |   5.968 GB/s |  0.64% |
+|        1 |      64 |        64 |            8 |       128 |       256 |  272.000 KiB |    16.000 KiB |         4096 |     64 |  18672x |  33.677 us |  53.10% |  26.784 us |   3.22% |  2.389M |  11.011 GB/s |  1.18% |
+|        1 |     128 |        64 |            8 |       128 |       256 |  528.000 KiB |    16.000 KiB |         4096 |    128 |  18144x |  34.341 us |  76.47% |  27.579 us |  61.01% |  4.641M |  20.198 GB/s |  2.16% |
+|        1 |     256 |        64 |            8 |       128 |       256 |    1.016 MiB |    16.000 KiB |         4096 |    256 |  16048x |  38.397 us | 325.26% |  31.181 us | 232.49% |  8.210M |  34.680 GB/s |  3.72% |
+|        1 |     512 |        64 |            8 |       128 |       256 |    2.016 MiB |    16.000 KiB |         4096 |    512 |  13856x |  42.907 us |  56.84% |  36.106 us |  38.67% | 14.181M |  58.991 GB/s |  6.32% |
+|        1 |    1024 |        64 |            8 |       128 |       256 |    4.016 MiB |    16.000 KiB |         4096 |   1024 |  10608x |  54.000 us |  48.26% |  47.183 us |  29.63% | 21.703M |  89.589 GB/s |  9.60% |
+|        1 |    2048 |        64 |            8 |       128 |       256 |    8.016 MiB |    16.000 KiB |         4096 |   2048 |   7200x |  76.459 us |  24.19% |  69.445 us |   1.40% | 29.491M | 121.267 GB/s | 13.00% |
+|        1 |    4096 |        64 |            8 |       128 |       256 |   16.016 MiB |    16.000 KiB |         4096 |   4096 |   4320x | 123.136 us |  20.12% | 116.158 us |   0.78% | 35.262M | 144.717 GB/s | 15.51% |
+|        1 |    8192 |        64 |            8 |       128 |       256 |   32.016 MiB |    16.000 KiB |         4096 |   8192 |   2424x | 213.440 us |  13.27% | 206.324 us |   0.43% | 39.705M | 162.789 GB/s | 17.45% |
+|        1 |   16384 |        64 |            8 |       128 |       256 |   64.016 MiB |    16.000 KiB |         4096 |  16384 |   1309x | 391.139 us |  15.75% | 382.225 us |   0.25% | 42.865M | 175.660 GB/s | 18.83% |
+
+# Mistral 7B-like with GQA(8)
+S=1 Hqo=32 Hkv=4 D=128 P=256 && ./build/flash_attention_benchmark \
+  -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P \
+  --disable-blocking-kernel --md "results/benchmark-mistral-7b-$S.md"
 # Devices
 
 ## [0] `NVIDIA A30`
@@ -148,30 +151,623 @@ S=64 Hqo=32 Hkv=32 D=128 P=256 && ./build/flash_attention_benchmark -a num_seqs=
 # Log
 
 ```
-Run:  [1/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=32 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 0.156429ms GPU, 0.164139ms CPU, 0.50s total GPU, 0.69s total wall, 3200x 
-Run:  [2/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=64 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 0.144429ms GPU, 0.152625ms CPU, 0.50s total GPU, 0.69s total wall, 3472x 
-Run:  [3/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=128 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 0.205407ms GPU, 0.214284ms CPU, 0.50s total GPU, 0.63s total wall, 2435x 
-Run:  [4/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=256 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 0.374437ms GPU, 0.383099ms CPU, 0.50s total GPU, 0.57s total wall, 1336x 
-Run:  [5/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=512 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 0.698028ms GPU, 0.708812ms CPU, 0.50s total GPU, 0.54s total wall, 717x 
-Run:  [6/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=1024 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 1.305016ms GPU, 1.319498ms CPU, 0.50s total GPU, 0.52s total wall, 384x 
-Run:  [7/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=2048 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 2.548824ms GPU, 2.555648ms CPU, 0.50s total GPU, 0.51s total wall, 197x 
-Run:  [8/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=4096 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 5.014692ms GPU, 5.022906ms CPU, 0.50s total GPU, 0.51s total wall, 100x 
-Run:  [9/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=8192 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 9.910915ms GPU, 9.917983ms CPU, 0.51s total GPU, 0.51s total wall, 51x 
-Run:  [10/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=16384 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 19.724012ms GPU, 19.762806ms CPU, 0.51s total GPU, 0.52s total wall, 26x 
-Run:  [11/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=32768 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=32 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.031404ms GPU, 0.038417ms CPU, 0.50s total GPU, 1.43s total wall, 15936x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=64 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.029810ms GPU, 0.036802ms CPU, 0.50s total GPU, 1.46s total wall, 16784x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=128 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.029120ms GPU, 0.036219ms CPU, 0.50s total GPU, 1.46s total wall, 17184x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=256 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.031998ms GPU, 0.038562ms CPU, 0.50s total GPU, 1.35s total wall, 15632x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.037193ms GPU, 0.043743ms CPU, 0.50s total GPU, 1.21s total wall, 13456x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.048290ms GPU, 0.055079ms CPU, 0.50s total GPU, 1.05s total wall, 10368x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.070200ms GPU, 0.076951ms CPU, 0.50s total GPU, 0.85s total wall, 7136x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.114441ms GPU, 0.121237ms CPU, 0.50s total GPU, 0.71s total wall, 4384x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.205479ms GPU, 0.212539ms CPU, 0.50s total GPU, 0.61s total wall, 2434x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=16384 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.384243ms GPU, 0.397885ms CPU, 0.50s total GPU, 0.57s total wall, 1302x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  |  Noise  |  GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|---------|------------|--------|---------|--------------|--------|
+|        1 |      32 |        32 |            4 |       128 |       256 |   72.000 KiB |     8.000 KiB |         2048 |     32 |  15936x |  38.417 us |  75.31% |  31.404 us | 71.61% |  1.019M |   2.609 GB/s |  0.28% |
+|        1 |      64 |        32 |            4 |       128 |       256 |  136.000 KiB |     8.000 KiB |         2048 |     64 |  16784x |  36.802 us |  56.15% |  29.810 us |  9.58% |  2.147M |   4.946 GB/s |  0.53% |
+|        1 |     128 |        32 |            4 |       128 |       256 |  264.000 KiB |     8.000 KiB |         2048 |    128 |  17184x |  36.219 us | 187.76% |  29.120 us |  4.00% |  4.396M |   9.565 GB/s |  1.03% |
+|        1 |     256 |        32 |            4 |       128 |       256 |  520.000 KiB |     8.000 KiB |         2048 |    256 |  15632x |  38.562 us |  20.62% |  31.998 us |  2.39% |  8.000M |  16.897 GB/s |  1.81% |
+|        1 |     512 |        32 |            4 |       128 |       256 |    1.008 MiB |     8.000 KiB |         2048 |    512 |  13456x |  43.743 us |  17.68% |  37.193 us |  1.80% | 13.766M |  28.634 GB/s |  3.07% |
+|        1 |    1024 |        32 |            4 |       128 |       256 |    2.008 MiB |     8.000 KiB |         2048 |   1024 |  10368x |  55.079 us |  17.42% |  48.290 us |  5.34% | 21.205M |  43.767 GB/s |  4.69% |
+|        1 |    2048 |        32 |            4 |       128 |       256 |    4.008 MiB |     8.000 KiB |         2048 |   2048 |   7136x |  76.951 us |  36.83% |  70.200 us | 28.25% | 29.174M |  59.982 GB/s |  6.43% |
+|        1 |    4096 |        32 |            4 |       128 |       256 |    8.008 MiB |     8.000 KiB |         2048 |   4096 |   4384x | 121.237 us |  17.95% | 114.441 us |  0.62% | 35.791M |  73.444 GB/s |  7.87% |
+|        1 |    8192 |        32 |            4 |       128 |       256 |   16.008 MiB |     8.000 KiB |         2048 |   8192 |   2434x | 212.539 us |  12.82% | 205.479 us |  0.40% | 39.868M |  81.729 GB/s |  8.76% |
+|        1 |   16384 |        32 |            4 |       128 |       256 |   32.008 MiB |     8.000 KiB |         2048 |  16384 |   1302x | 397.885 us |  66.59% | 384.243 us |  0.32% | 42.640M |  87.369 GB/s |  9.36% |
+
+# Phi-2 2.7B-like 
+S=1 Hqo=32 Hkv=32 D=80 P=256 && ./build/flash_attention_benchmark \
+  -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P \
+  --disable-blocking-kernel --md "results/benchmark-phi2-$S.md"
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=32 num_heads=32 num_kv_heads=32 head_size=80 page_size=256]
+Pass: Cold: 0.024349ms GPU, 0.031255ms CPU, 0.50s total GPU, 1.85s total wall, 20544x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=64 num_heads=32 num_kv_heads=32 head_size=80 page_size=256]
+Pass: Cold: 0.024272ms GPU, 0.031145ms CPU, 0.50s total GPU, 1.80s total wall, 20608x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=128 num_heads=32 num_kv_heads=32 head_size=80 page_size=256]
+Pass: Cold: 0.026111ms GPU, 0.032717ms CPU, 0.50s total GPU, 1.72s total wall, 19152x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=256 num_heads=32 num_kv_heads=32 head_size=80 page_size=256]
+Pass: Cold: 0.029673ms GPU, 0.036588ms CPU, 0.50s total GPU, 1.54s total wall, 16864x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=32 head_size=80 page_size=256]
+Pass: Cold: 0.035911ms GPU, 0.042515ms CPU, 0.50s total GPU, 1.34s total wall, 13936x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=32 head_size=80 page_size=256]
+Pass: Cold: 0.050344ms GPU, 0.056951ms CPU, 0.50s total GPU, 1.08s total wall, 9936x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=32 head_size=80 page_size=256]
+Pass: Cold: 0.079241ms GPU, 0.085801ms CPU, 0.50s total GPU, 0.86s total wall, 6320x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=32 head_size=80 page_size=256]
+Pass: Cold: 0.126077ms GPU, 0.133024ms CPU, 0.50s total GPU, 0.71s total wall, 3968x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=32 head_size=80 page_size=256]
+Pass: Cold: 0.219900ms GPU, 0.226994ms CPU, 0.50s total GPU, 0.63s total wall, 2288x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=16384 num_heads=32 num_kv_heads=32 head_size=80 page_size=256]
+Pass: Cold: 0.408336ms GPU, 0.415312ms CPU, 0.50s total GPU, 0.56s total wall, 1225x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  | Noise  |  GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|--------|------------|--------|---------|--------------|--------|
+|        1 |      32 |        32 |           32 |        80 |       256 |  325.000 KiB |     5.000 KiB |        10240 |     32 |  20544x |  31.255 us | 32.16% |  24.349 us | 11.70% |  1.314M |  13.878 GB/s |  1.49% |
+|        1 |      64 |        32 |           32 |        80 |       256 |  645.000 KiB |     5.000 KiB |        10240 |     64 |  20608x |  31.145 us | 92.96% |  24.272 us | 55.88% |  2.637M |  27.422 GB/s |  2.94% |
+|        1 |     128 |        32 |           32 |        80 |       256 |    1.255 MiB |     5.000 KiB |        10240 |    128 |  19152x |  32.717 us | 62.36% |  26.111 us | 56.99% |  4.902M |  50.591 GB/s |  5.42% |
+|        1 |     256 |        32 |           32 |        80 |       256 |    2.505 MiB |     5.000 KiB |        10240 |    256 |  16864x |  36.588 us | 74.19% |  29.673 us |  2.45% |  8.627M |  88.689 GB/s |  9.50% |
+|        1 |     512 |        32 |           32 |        80 |       256 |    5.005 MiB |     5.000 KiB |        10240 |    512 |  13936x |  42.515 us | 41.41% |  35.911 us | 37.09% | 14.257M | 146.281 GB/s | 15.68% |
+|        1 |    1024 |        32 |           32 |        80 |       256 |   10.005 MiB |     5.000 KiB |        10240 |   1024 |   9936x |  56.951 us | 14.03% |  50.344 us |  5.08% | 20.340M | 208.485 GB/s | 22.34% |
+|        1 |    2048 |        32 |           32 |        80 |       256 |   20.005 MiB |     5.000 KiB |        10240 |   2048 |   6320x |  85.801 us |  8.56% |  79.241 us |  2.27% | 25.845M | 264.785 GB/s | 28.38% |
+|        1 |    4096 |        32 |           32 |        80 |       256 |   40.005 MiB |     5.000 KiB |        10240 |   4096 |   3968x | 133.024 us | 22.32% | 126.077 us |  0.89% | 32.488M | 332.758 GB/s | 35.66% |
+|        1 |    8192 |        32 |           32 |        80 |       256 |   80.005 MiB |     5.000 KiB |        10240 |   8192 |   2288x | 226.994 us | 12.03% | 219.900 us |  0.57% | 37.253M | 381.521 GB/s | 40.89% |
+|        1 |   16384 |        32 |           32 |        80 |       256 |  160.005 MiB |     5.000 KiB |        10240 |  16384 |   1225x | 415.312 us |  1.98% | 408.336 us |  0.35% | 40.124M | 410.893 GB/s | 44.03% |
+
+# Multi-Query Attention test (MQA)
+S=1 Hqo=32 Hkv=1 D=128 P=256 && ./build/flash_attention_benchmark \
+  -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P \
+  --disable-blocking-kernel --md "results/benchmark-mqa-$S.md"
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=32 num_heads=32 num_kv_heads=1 head_size=128 page_size=256]
+Pass: Cold: 0.048974ms GPU, 0.055945ms CPU, 0.50s total GPU, 1.05s total wall, 10224x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=64 num_heads=32 num_kv_heads=1 head_size=128 page_size=256]
+Pass: Cold: 0.046815ms GPU, 0.053500ms CPU, 0.50s total GPU, 1.06s total wall, 10688x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=128 num_heads=32 num_kv_heads=1 head_size=128 page_size=256]
+Pass: Cold: 0.046881ms GPU, 0.054247ms CPU, 0.50s total GPU, 1.07s total wall, 10672x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=256 num_heads=32 num_kv_heads=1 head_size=128 page_size=256]
+Pass: Cold: 0.049892ms GPU, 0.056582ms CPU, 0.50s total GPU, 1.02s total wall, 10032x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=1 head_size=128 page_size=256]
+Pass: Cold: 0.055292ms GPU, 0.062326ms CPU, 0.53s total GPU, 1.02s total wall, 9504x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=1 head_size=128 page_size=256]
+Pass: Cold: 0.065978ms GPU, 0.072657ms CPU, 0.50s total GPU, 0.88s total wall, 7584x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=1 head_size=128 page_size=256]
+Pass: Cold: 0.087792ms GPU, 0.096413ms CPU, 0.50s total GPU, 0.79s total wall, 5696x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=1 head_size=128 page_size=256]
+Pass: Cold: 0.131498ms GPU, 0.138213ms CPU, 0.50s total GPU, 0.69s total wall, 3808x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=1 head_size=128 page_size=256]
+Pass: Cold: 0.219580ms GPU, 0.227309ms CPU, 0.71s total GPU, 0.87s total wall, 3216x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=16384 num_heads=32 num_kv_heads=1 head_size=128 page_size=256]
+Pass: Cold: 0.283535ms GPU, 0.292040ms CPU, 0.50s total GPU, 0.59s total wall, 1764x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  |  Noise  |  GPU Time  | Noise  |  Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|---------|------------|--------|----------|--------------|--------|
+|        1 |      32 |        32 |            1 |       128 |       256 |   24.000 KiB |     8.000 KiB |       512.02 |     32 |  10224x |  55.945 us |  19.62% |  48.974 us | 12.20% | 653.414K | 669.096 MB/s |  0.07% |
+|        1 |      64 |        32 |            1 |       128 |       256 |   40.000 KiB |     8.000 KiB |       512.02 |     64 |  10688x |  53.500 us |  14.36% |  46.815 us |  1.73% |   1.367M |   1.050 GB/s |  0.11% |
+|        1 |     128 |        32 |            1 |       128 |       256 |   72.000 KiB |     8.000 KiB |       512.02 |    128 |  10672x |  54.247 us | 148.10% |  46.881 us |  2.11% |   2.730M |   1.747 GB/s |  0.19% |
+|        1 |     256 |        32 |            1 |       128 |       256 |  136.000 KiB |     8.000 KiB |       512.02 |    256 |  10032x |  56.582 us |  13.50% |  49.892 us |  1.66% |   5.131M |   2.956 GB/s |  0.32% |
+|        1 |     512 |        32 |            1 |       128 |       256 |  264.000 KiB |     8.000 KiB |       512.02 |    512 |   9504x |  62.326 us |  39.69% |  55.292 us | 24.66% |   9.260M |   5.037 GB/s |  0.54% |
+|        1 |    1024 |        32 |            1 |       128 |       256 |  520.000 KiB |     8.000 KiB |       512.02 |   1024 |   7584x |  72.657 us |  10.18% |  65.978 us |  1.20% |  15.520M |   8.195 GB/s |  0.88% |
+|        1 |    2048 |        32 |            1 |       128 |       256 |    1.008 MiB |     8.000 KiB |       512.02 |   2048 |   5696x |  96.413 us | 137.85% |  87.792 us |  3.36% |  23.328M |  12.131 GB/s |  1.30% |
+|        1 |    4096 |        32 |            1 |       128 |       256 |    2.008 MiB |     8.000 KiB |       512.02 |   4096 |   3808x | 138.213 us |   5.20% | 131.498 us |  0.99% |  31.149M |  16.073 GB/s |  1.72% |
+|        1 |    8192 |        32 |            1 |       128 |       256 |    4.008 MiB |     8.000 KiB |       512.02 |   8192 |   3216x | 227.309 us |  20.68% | 219.580 us |  9.60% |  37.308M |  19.176 GB/s |  2.06% |
+|        1 |   16384 |        32 |            1 |       128 |       256 |    8.008 MiB |     8.000 KiB |       512.02 |  16384 |   1764x | 292.040 us |  19.38% | 283.535 us |  0.35% |  57.785M |  29.644 GB/s |  3.18% |
+
+# Batch size scaling tests (with standard Llama 2 7B config)
+for S in 1 2 4 8 16 32 64 128; do
+  Hqo=32 Hkv=32 D=128 P=256 && ./build/flash_attention_benchmark \
+    -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P \
+    --disable-blocking-kernel --md "results/benchmark-batch-scaling-$S.md"
+done
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=32 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.025214ms GPU, 0.032125ms CPU, 0.50s total GPU, 1.81s total wall, 19840x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=64 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.025042ms GPU, 0.031915ms CPU, 0.50s total GPU, 1.76s total wall, 19968x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=128 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.026660ms GPU, 0.033294ms CPU, 0.50s total GPU, 1.68s total wall, 18768x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=256 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.030243ms GPU, 0.037066ms CPU, 0.50s total GPU, 1.53s total wall, 16544x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.039362ms GPU, 0.046138ms CPU, 0.50s total GPU, 1.25s total wall, 12704x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.055793ms GPU, 0.062883ms CPU, 0.50s total GPU, 1.02s total wall, 8976x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.083784ms GPU, 0.091177ms CPU, 0.50s total GPU, 0.85s total wall, 5968x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.129118ms GPU, 0.136764ms CPU, 0.50s total GPU, 0.72s total wall, 3888x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.219591ms GPU, 0.228144ms CPU, 0.50s total GPU, 0.63s total wall, 2288x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=16384 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.401182ms GPU, 0.416668ms CPU, 0.53s total GPU, 0.61s total wall, 1312x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  |  Noise  |  GPU Time  |  Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|---------|------------|---------|---------|--------------|--------|
+|        1 |      32 |        32 |           32 |       128 |       256 |  520.000 KiB |     8.000 KiB |        16384 |     32 |  19840x |  32.125 us |  85.18% |  25.214 us |  64.02% |  1.269M |  21.444 GB/s |  2.30% |
+|        1 |      64 |        32 |           32 |       128 |       256 |    1.008 MiB |     8.000 KiB |        16384 |     64 |  19968x |  31.915 us | 231.82% |  25.042 us | 217.45% |  2.556M |  42.527 GB/s |  4.56% |
+|        1 |     128 |        32 |           32 |       128 |       256 |    2.008 MiB |     8.000 KiB |        16384 |    128 |  18768x |  33.294 us |  70.83% |  26.660 us |  66.31% |  4.801M |  79.277 GB/s |  8.50% |
+|        1 |     256 |        32 |           32 |       128 |       256 |    4.008 MiB |     8.000 KiB |        16384 |    256 |  16544x |  37.066 us |  52.09% |  30.243 us |   3.20% |  8.465M | 139.228 GB/s | 14.92% |
+|        1 |     512 |        32 |           32 |       128 |       256 |    8.008 MiB |     8.000 KiB |        16384 |    512 |  12704x |  46.138 us | 240.66% |  39.362 us | 239.93% | 13.008M | 213.532 GB/s | 22.88% |
+|        1 |    1024 |        32 |           32 |       128 |       256 |   16.008 MiB |     8.000 KiB |        16384 |   1024 |   8976x |  62.883 us |  58.72% |  55.793 us |  30.65% | 18.353M | 300.996 GB/s | 32.26% |
+|        1 |    2048 |        32 |           32 |       128 |       256 |   32.008 MiB |     8.000 KiB |        16384 |   2048 |   5968x |  91.177 us |  42.98% |  83.784 us |   1.75% | 24.444M | 400.684 GB/s | 42.94% |
+|        1 |    4096 |        32 |           32 |       128 |       256 |   64.008 MiB |     8.000 KiB |        16384 |   4096 |   3888x | 136.764 us |  18.35% | 129.118 us |   1.00% | 31.723M | 519.876 GB/s | 55.71% |
+|        1 |    8192 |        32 |           32 |       128 |       256 |  128.008 MiB |     8.000 KiB |        16384 |   8192 |   2288x | 228.144 us |  24.86% | 219.591 us |   0.66% | 37.306M | 611.292 GB/s | 65.51% |
+|        1 |   16384 |        32 |           32 |       128 |       256 |  256.008 MiB |     8.000 KiB |        16384 |  16384 |   1312x | 416.668 us |  70.09% | 401.182 us |   0.53% | 40.839M | 669.152 GB/s | 71.71% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=2 seq_len=32 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.028575ms GPU, 0.035437ms CPU, 0.50s total GPU, 1.63s total wall, 17504x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=2 seq_len=64 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.029077ms GPU, 0.035740ms CPU, 0.50s total GPU, 1.56s total wall, 17200x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=2 seq_len=128 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.031912ms GPU, 0.038954ms CPU, 0.50s total GPU, 1.47s total wall, 15680x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=2 seq_len=256 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.038070ms GPU, 0.044740ms CPU, 0.50s total GPU, 1.28s total wall, 13136x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=2 seq_len=512 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.053200ms GPU, 0.059872ms CPU, 0.50s total GPU, 1.05s total wall, 9408x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=2 seq_len=1024 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.081359ms GPU, 0.088350ms CPU, 0.50s total GPU, 0.84s total wall, 6160x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=2 seq_len=2048 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.121875ms GPU, 0.129670ms CPU, 0.50s total GPU, 0.73s total wall, 4112x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=2 seq_len=4096 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.204837ms GPU, 0.212175ms CPU, 0.50s total GPU, 0.63s total wall, 2448x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=2 seq_len=8192 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.369872ms GPU, 0.377513ms CPU, 0.50s total GPU, 0.58s total wall, 1360x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=2 seq_len=16384 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.700706ms GPU, 0.709036ms CPU, 0.50s total GPU, 0.54s total wall, 720x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  |  Noise  |  GPU Time  |  Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|---------|------------|---------|---------|--------------|--------|
+|        2 |      32 |        32 |           32 |       128 |       256 |    1.016 MiB |    16.000 KiB |        16384 |     64 |  17504x |  35.437 us |  26.89% |  28.575 us |  38.85% |  2.240M |  37.842 GB/s |  4.06% |
+|        2 |      64 |        32 |           32 |       128 |       256 |    2.016 MiB |    16.000 KiB |        16384 |    128 |  17200x |  35.740 us |  53.67% |  29.077 us |  48.53% |  4.402M |  73.251 GB/s |  7.85% |
+|        2 |     128 |        32 |           32 |       128 |       256 |    4.016 MiB |    16.000 KiB |        16384 |    256 |  15680x |  38.954 us | 204.14% |  31.912 us | 191.51% |  8.022M | 132.459 GB/s | 14.20% |
+|        2 |     256 |        32 |           32 |       128 |       256 |    8.016 MiB |    16.000 KiB |        16384 |    512 |  13136x |  44.740 us |  39.68% |  38.070 us |  35.59% | 13.449M | 221.206 GB/s | 23.71% |
+|        2 |     512 |        32 |           32 |       128 |       256 |   16.016 MiB |    16.000 KiB |        16384 |   1024 |   9408x |  59.872 us |  13.44% |  53.200 us |   5.07% | 19.248M | 315.980 GB/s | 33.86% |
+|        2 |    1024 |        32 |           32 |       128 |       256 |   32.016 MiB |    16.000 KiB |        16384 |   2048 |   6160x |  88.350 us |  32.63% |  81.359 us |   1.54% | 25.172M | 412.829 GB/s | 44.24% |
+|        2 |    2048 |        32 |           32 |       128 |       256 |   64.016 MiB |    16.000 KiB |        16384 |   4096 |   4112x | 129.670 us |  23.77% | 121.875 us |   1.28% | 33.608M | 550.906 GB/s | 59.04% |
+|        2 |    4096 |        32 |           32 |       128 |       256 |  128.016 MiB |    16.000 KiB |        16384 |   8192 |   2448x | 212.175 us |  17.74% | 204.837 us |   1.04% | 39.993M | 655.401 GB/s | 70.24% |
+|        2 |    8192 |        32 |           32 |       128 |       256 |  256.016 MiB |    16.000 KiB |        16384 |  16384 |   1360x | 377.513 us |  10.38% | 369.872 us |   0.84% | 44.296M | 725.841 GB/s | 77.79% |
+|        2 |   16384 |        32 |           32 |       128 |       256 |  512.016 MiB |    16.000 KiB |        16384 |  32768 |    720x | 709.036 us |   6.35% | 700.706 us |   0.72% | 46.764M | 766.232 GB/s | 82.12% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=4 seq_len=32 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.024012ms GPU, 0.031121ms CPU, 0.50s total GPU, 1.90s total wall, 20832x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=4 seq_len=64 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.025791ms GPU, 0.032677ms CPU, 0.50s total GPU, 1.73s total wall, 19392x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=4 seq_len=128 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.029425ms GPU, 0.036131ms CPU, 0.50s total GPU, 1.56s total wall, 17008x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=4 seq_len=256 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.046406ms GPU, 0.053067ms CPU, 0.50s total GPU, 1.14s total wall, 10784x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=4 seq_len=512 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.078841ms GPU, 0.085723ms CPU, 0.50s total GPU, 0.86s total wall, 6352x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=4 seq_len=1024 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.132351ms GPU, 0.139576ms CPU, 0.50s total GPU, 0.71s total wall, 3792x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=4 seq_len=2048 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.239385ms GPU, 0.246610ms CPU, 0.50s total GPU, 0.62s total wall, 2096x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=4 seq_len=4096 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.448337ms GPU, 0.463742ms CPU, 0.50s total GPU, 0.57s total wall, 1120x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=4 seq_len=8192 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.845724ms GPU, 0.854913ms CPU, 0.50s total GPU, 0.53s total wall, 592x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=4 seq_len=16384 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 1.594034ms GPU, 1.604244ms CPU, 0.84s total GPU, 0.87s total wall, 528x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  |  Noise  |  GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|---------|------------|--------|---------|--------------|--------|
+|        4 |      32 |        32 |           32 |       128 |       256 |    2.031 MiB |    32.000 KiB |        16384 |    128 |  20832x |  31.121 us | 100.19% |  24.012 us | 10.16% |  5.331M |  90.066 GB/s |  9.65% |
+|        4 |      64 |        32 |           32 |       128 |       256 |    4.031 MiB |    32.000 KiB |        16384 |    256 |  19392x |  32.677 us | 101.29% |  25.791 us |  4.09% |  9.926M | 165.170 GB/s | 17.70% |
+|        4 |     128 |        32 |           32 |       128 |       256 |    8.031 MiB |    32.000 KiB |        16384 |    512 |  17008x |  36.131 us |  50.93% |  29.425 us |  3.00% | 17.400M | 287.308 GB/s | 30.79% |
+|        4 |     256 |        32 |           32 |       128 |       256 |   16.031 MiB |    32.000 KiB |        16384 |   1024 |  10784x |  53.067 us |  37.96% |  46.406 us |  5.94% | 22.066M | 362.944 GB/s | 38.90% |
+|        4 |     512 |        32 |           32 |       128 |       256 |   32.031 MiB |    32.000 KiB |        16384 |   2048 |   6352x |  85.723 us |  30.55% |  78.841 us |  3.39% | 25.976M | 426.427 GB/s | 45.70% |
+|        4 |    1024 |        32 |           32 |       128 |       256 |   64.031 MiB |    32.000 KiB |        16384 |   4096 |   3792x | 139.576 us |   8.21% | 132.351 us |  3.81% | 30.948M | 507.548 GB/s | 54.39% |
+|        4 |    2048 |        32 |           32 |       128 |       256 |  128.031 MiB |    32.000 KiB |        16384 |   8192 |   2096x | 246.610 us |  13.55% | 239.385 us |  2.61% | 34.221M | 560.950 GB/s | 60.12% |
+|        4 |    4096 |        32 |           32 |       128 |       256 |  256.031 MiB |    32.000 KiB |        16384 |  16384 |   1120x | 463.742 us |  66.50% | 448.337 us |  3.34% | 36.544M | 598.882 GB/s | 64.18% |
+|        4 |    8192 |        32 |           32 |       128 |       256 |  512.031 MiB |    32.000 KiB |        16384 |  32768 |    592x | 854.913 us |   8.89% | 845.724 us |  4.70% | 38.746M | 634.884 GB/s | 68.04% |
+|        4 |   16384 |        32 |           32 |       128 |       256 |    1.000 GiB |    32.000 KiB |        16384 |  65536 |    528x |   1.604 ms |   5.41% |   1.594 ms |  4.02% | 41.113M | 673.641 GB/s | 72.19% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=32 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.031547ms GPU, 0.038987ms CPU, 0.50s total GPU, 1.53s total wall, 15856x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=64 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.033440ms GPU, 0.040552ms CPU, 0.50s total GPU, 1.42s total wall, 14960x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=128 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.044463ms GPU, 0.051140ms CPU, 0.50s total GPU, 1.17s total wall, 11248x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=256 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.072791ms GPU, 0.079909ms CPU, 0.50s total GPU, 0.89s total wall, 6880x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=512 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.117951ms GPU, 0.125003ms CPU, 0.50s total GPU, 0.74s total wall, 4240x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=1024 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.207328ms GPU, 0.214897ms CPU, 0.50s total GPU, 0.63s total wall, 2416x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=2048 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.382026ms GPU, 0.390796ms CPU, 0.50s total GPU, 0.57s total wall, 1309x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=4096 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.732934ms GPU, 0.749065ms CPU, 0.61s total GPU, 0.66s total wall, 832x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=8192 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 1.417645ms GPU, 1.428117ms CPU, 0.84s total GPU, 0.87s total wall, 592x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=16384 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 2.716955ms GPU, 2.723642ms CPU, 0.52s total GPU, 0.53s total wall, 192x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  | Noise  |  GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|--------|------------|--------|---------|--------------|--------|
+|        8 |      32 |        32 |           32 |       128 |       256 |    4.062 MiB |    64.000 KiB |        16384 |    256 |  15856x |  38.987 us | 92.09% |  31.547 us | 11.86% |  8.115M | 137.109 GB/s | 14.69% |
+|        8 |      64 |        32 |           32 |       128 |       256 |    8.062 MiB |    64.000 KiB |        16384 |    512 |  14960x |  40.552 us | 90.21% |  33.440 us |  3.23% | 15.311M | 254.774 GB/s | 27.30% |
+|        8 |     128 |        32 |           32 |       128 |       256 |   16.062 MiB |    64.000 KiB |        16384 |   1024 |  11248x |  51.140 us | 39.58% |  44.463 us | 36.62% | 23.030M | 380.277 GB/s | 40.75% |
+|        8 |     256 |        32 |           32 |       128 |       256 |   32.062 MiB |    64.000 KiB |        16384 |   2048 |   6880x |  79.909 us | 35.69% |  72.791 us |  1.20% | 28.135M | 462.772 GB/s | 49.59% |
+|        8 |     512 |        32 |           32 |       128 |       256 |   64.062 MiB |    64.000 KiB |        16384 |   4096 |   4240x | 125.003 us | 20.68% | 117.951 us |  1.71% | 34.726M | 570.065 GB/s | 61.09% |
+|        8 |    1024 |        32 |           32 |       128 |       256 |  128.062 MiB |    64.000 KiB |        16384 |   8192 |   2416x | 214.897 us | 17.56% | 207.328 us |  0.68% | 39.512M | 648.001 GB/s | 69.44% |
+|        8 |    2048 |        32 |           32 |       128 |       256 |  256.062 MiB |    64.000 KiB |        16384 |  16384 |   1309x | 390.796 us | 13.88% | 382.026 us |  0.45% | 42.887M | 703.005 GB/s | 75.34% |
+|        8 |    4096 |        32 |           32 |       128 |       256 |  512.062 MiB |    64.000 KiB |        16384 |  32768 |    832x | 749.065 us | 37.09% | 732.934 us |  0.55% | 44.708M | 732.674 GB/s | 78.52% |
+|        8 |    8192 |        32 |           32 |       128 |       256 |    1.000 GiB |    64.000 KiB |        16384 |  65536 |    592x |   1.428 ms |  4.32% |   1.418 ms |  1.62% | 46.229M | 757.505 GB/s | 81.18% |
+|        8 |   16384 |        32 |           32 |       128 |       256 |    2.000 GiB |    64.000 KiB |        16384 | 131072 |    192x |   2.724 ms |  2.73% |   2.717 ms |  2.72% | 48.242M | 790.449 GB/s | 84.71% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=32 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.048846ms GPU, 0.055905ms CPU, 0.50s total GPU, 1.14s total wall, 10240x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=64 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.052843ms GPU, 0.059869ms CPU, 0.50s total GPU, 1.05s total wall, 9472x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=128 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.074516ms GPU, 0.082269ms CPU, 0.50s total GPU, 0.89s total wall, 6720x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=256 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.118202ms GPU, 0.125576ms CPU, 0.50s total GPU, 0.74s total wall, 4240x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=512 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.199450ms GPU, 0.207135ms CPU, 0.54s total GPU, 0.69s total wall, 2688x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=1024 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.357677ms GPU, 0.369746ms CPU, 0.90s total GPU, 1.05s total wall, 2512x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=2048 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.678202ms GPU, 0.691302ms CPU, 0.50s total GPU, 0.54s total wall, 738x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=4096 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 1.305419ms GPU, 1.334700ms CPU, 0.50s total GPU, 0.53s total wall, 384x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=8192 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 2.538953ms GPU, 2.552098ms CPU, 0.50s total GPU, 0.51s total wall, 197x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=16384 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 5.027277ms GPU, 5.128041ms CPU, 0.50s total GPU, 0.52s total wall, 100x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  |  Noise  |  GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|---------|------------|--------|---------|--------------|--------|
+|       16 |      32 |        32 |           32 |       128 |       256 |    8.125 MiB |   128.000 KiB |        16384 |    512 |  10240x |  55.905 us |  34.97% |  48.846 us | 14.19% | 10.482M | 177.104 GB/s | 18.98% |
+|       16 |      64 |        32 |           32 |       128 |       256 |   16.125 MiB |   128.000 KiB |        16384 |   1024 |   9472x |  59.869 us |  54.38% |  52.843 us |  2.11% | 19.378M | 322.452 GB/s | 34.56% |
+|       16 |     128 |        32 |           32 |       128 |       256 |   32.125 MiB |   128.000 KiB |        16384 |   2048 |   6720x |  82.269 us | 101.74% |  74.516 us |  1.81% | 27.484M | 453.814 GB/s | 48.63% |
+|       16 |     256 |        32 |           32 |       128 |       256 |   64.125 MiB |   128.000 KiB |        16384 |   4096 |   4240x | 125.576 us |   9.16% | 118.202 us |  0.90% | 34.652M | 569.964 GB/s | 61.08% |
+|       16 |     512 |        32 |           32 |       128 |       256 |  128.125 MiB |   128.000 KiB |        16384 |   8192 |   2688x | 207.135 us |  21.30% | 199.450 us |  0.96% | 41.073M | 674.253 GB/s | 72.26% |
+|       16 |    1024 |        32 |           32 |       128 |       256 |  256.125 MiB |   128.000 KiB |        16384 |  16384 |   2512x | 369.746 us |  54.48% | 357.677 us |  1.05% | 45.807M | 751.229 GB/s | 80.51% |
+|       16 |    2048 |        32 |           32 |       128 |       256 |  512.125 MiB |   128.000 KiB |        16384 |  32768 |    738x | 691.302 us |  13.40% | 678.202 us |  0.36% | 48.316M | 791.996 GB/s | 84.88% |
+|       16 |    4096 |        32 |           32 |       128 |       256 |    1.000 GiB |   128.000 KiB |        16384 |  65536 |    384x |   1.335 ms |  34.04% |   1.305 ms |  0.30% | 50.203M | 822.728 GB/s | 88.17% |
+|       16 |    8192 |        32 |           32 |       128 |       256 |    2.000 GiB |   128.000 KiB |        16384 | 131072 |    197x |   2.552 ms |   3.57% |   2.539 ms |  0.21% | 51.624M | 845.918 GB/s | 90.65% |
+|       16 |   16384 |        32 |           32 |       128 |       256 |    4.000 GiB |   128.000 KiB |        16384 | 262144 |    100x |   5.128 ms |  18.82% |   5.027 ms |  0.19% | 52.144M | 854.385 GB/s | 91.56% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=32 seq_len=32 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.081684ms GPU, 0.089641ms CPU, 0.50s total GPU, 0.87s total wall, 6128x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=32 seq_len=64 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.084619ms GPU, 0.091643ms CPU, 0.50s total GPU, 0.82s total wall, 5920x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=32 seq_len=128 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.117701ms GPU, 0.125194ms CPU, 0.50s total GPU, 0.74s total wall, 4256x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=32 seq_len=256 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.203713ms GPU, 0.212315ms CPU, 0.50s total GPU, 0.64s total wall, 2464x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=32 seq_len=512 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.367752ms GPU, 0.374626ms CPU, 0.61s total GPU, 0.70s total wall, 1648x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=32 seq_len=1024 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.678250ms GPU, 0.687914ms CPU, 0.50s total GPU, 0.54s total wall, 738x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=32 seq_len=2048 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 1.317934ms GPU, 1.327665ms CPU, 0.50s total GPU, 0.52s total wall, 380x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=32 seq_len=4096 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 2.560486ms GPU, 2.568136ms CPU, 0.50s total GPU, 0.51s total wall, 196x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=32 seq_len=8192 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 5.046507ms GPU, 5.053597ms CPU, 0.50s total GPU, 0.51s total wall, 100x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=32 seq_len=16384 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 10.060595ms GPU, 10.133313ms CPU, 0.50s total GPU, 0.51s total wall, 50x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  | Noise  |  GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|--------|------------|--------|---------|--------------|--------|
+|       32 |      32 |        32 |           32 |       128 |       256 |   16.250 MiB |   256.000 KiB |        16384 |   1024 |   6128x |  89.641 us | 44.72% |  81.684 us | 15.53% | 12.536M | 211.810 GB/s | 22.70% |
+|       32 |      64 |        32 |           32 |       128 |       256 |   32.250 MiB |   256.000 KiB |        16384 |   2048 |   5920x |  91.643 us | 44.14% |  84.619 us | 37.11% | 24.203M | 402.733 GB/s | 43.16% |
+|       32 |     128 |        32 |           32 |       128 |       256 |   64.250 MiB |   256.000 KiB |        16384 |   4096 |   4256x | 125.194 us | 34.79% | 117.701 us |  0.97% | 34.800M | 574.619 GB/s | 61.58% |
+|       32 |     256 |        32 |           32 |       128 |       256 |  128.250 MiB |   256.000 KiB |        16384 |   8192 |   2464x | 212.315 us | 33.10% | 203.713 us |  0.55% | 40.213M | 661.431 GB/s | 70.88% |
+|       32 |     512 |        32 |           32 |       128 |       256 |  256.250 MiB |   256.000 KiB |        16384 |  16384 |   1648x | 374.626 us |  1.95% | 367.752 us |  0.55% | 44.552M | 731.362 GB/s | 78.38% |
+|       32 |    1024 |        32 |           32 |       128 |       256 |  512.250 MiB |   256.000 KiB |        16384 |  32768 |    738x | 687.914 us |  8.49% | 678.250 us |  0.44% | 48.313M | 792.326 GB/s | 84.91% |
+|       32 |    2048 |        32 |           32 |       128 |       256 |    1.000 GiB |   256.000 KiB |        16384 |  65536 |    380x |   1.328 ms |  4.18% |   1.318 ms |  0.41% | 49.726M | 815.114 GB/s | 87.35% |
+|       32 |    4096 |        32 |           32 |       128 |       256 |    2.000 GiB |   256.000 KiB |        16384 | 131072 |    196x |   2.568 ms |  0.50% |   2.560 ms |  0.24% | 51.190M | 838.906 GB/s | 89.90% |
+|       32 |    8192 |        32 |           32 |       128 |       256 |    4.000 GiB |   256.000 KiB |        16384 | 262144 |    100x |   5.054 ms |  0.18% |   5.047 ms |  0.12% | 51.946M | 851.181 GB/s | 91.22% |
+|       32 |   16384 |        32 |           32 |       128 |       256 |    8.000 GiB |   256.000 KiB |        16384 | 524288 |     50x |  10.133 ms |  4.68% |  10.061 ms |  0.10% | 52.113M | 853.872 GB/s | 91.51% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=32 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.150302ms GPU, 0.157754ms CPU, 0.50s total GPU, 0.70s total wall, 3328x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=64 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.144468ms GPU, 0.151853ms CPU, 0.50s total GPU, 0.69s total wall, 3472x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=128 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.205576ms GPU, 0.213378ms CPU, 0.57s total GPU, 0.72s total wall, 2768x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=256 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.374858ms GPU, 0.382902ms CPU, 0.50s total GPU, 0.57s total wall, 1334x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=512 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.698158ms GPU, 0.710006ms CPU, 0.50s total GPU, 0.54s total wall, 717x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=1024 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 1.305379ms GPU, 1.319346ms CPU, 0.50s total GPU, 0.52s total wall, 384x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=2048 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 2.548325ms GPU, 2.572255ms CPU, 0.50s total GPU, 0.52s total wall, 197x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=4096 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 5.013740ms GPU, 5.025026ms CPU, 0.50s total GPU, 0.51s total wall, 100x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=8192 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 9.912882ms GPU, 9.919824ms CPU, 0.51s total GPU, 0.51s total wall, 51x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=16384 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 19.720704ms GPU, 19.804345ms CPU, 0.51s total GPU, 0.52s total wall, 26x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens  | Samples |  CPU Time  | Noise  |  GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|---------|---------|------------|--------|------------|--------|---------|--------------|--------|
+|       64 |      32 |        32 |           32 |       128 |       256 |   32.500 MiB |   512.000 KiB |        16385 |    2048 |   3328x | 157.754 us | 23.91% | 150.302 us | 18.07% | 13.626M | 230.223 GB/s | 24.67% |
+|       64 |      64 |        32 |           32 |       128 |       256 |   64.500 MiB |   512.000 KiB |        16385 |    4096 |   3472x | 151.853 us | 22.64% | 144.468 us |  0.52% | 28.352M | 471.783 GB/s | 50.56% |
+|       64 |     128 |        32 |           32 |       128 |       256 |  128.500 MiB |   512.000 KiB |        16385 |    8192 |   2768x | 213.378 us | 23.35% | 205.576 us |  0.81% | 39.849M | 657.986 GB/s | 70.51% |
+|       64 |     256 |        32 |           32 |       128 |       256 |  256.500 MiB |   512.000 KiB |        16385 |   16384 |   1334x | 382.902 us | 15.22% | 374.858 us |  0.28% | 43.707M | 718.897 GB/s | 77.04% |
+|       64 |     512 |        32 |           32 |       128 |       256 |  512.500 MiB |   512.000 KiB |        16385 |   32768 |    717x | 710.006 us | 14.48% | 698.158 us |  0.27% | 46.935M | 770.484 GB/s | 82.57% |
+|       64 |    1024 |        32 |           32 |       128 |       256 |    1.000 GiB |   512.000 KiB |        16385 |   65536 |    384x |   1.319 ms | 10.29% |   1.305 ms |  0.18% | 50.205M | 823.355 GB/s | 88.24% |
+|       64 |    2048 |        32 |           32 |       128 |       256 |    2.000 GiB |   512.000 KiB |        16385 |  131072 |    197x |   2.572 ms |  9.59% |   2.548 ms |  0.18% | 51.435M | 843.115 GB/s | 90.35% |
+|       64 |    4096 |        32 |           32 |       128 |       256 |    4.000 GiB |   512.000 KiB |        16385 |  262144 |    100x |   5.025 ms |  0.95% |   5.014 ms |  0.13% | 52.285M | 856.849 GB/s | 91.83% |
+|       64 |    8192 |        32 |           32 |       128 |       256 |    8.000 GiB |   512.000 KiB |        16385 |  524288 |     51x |   9.920 ms |  0.15% |   9.913 ms |  0.13% | 52.890M | 866.648 GB/s | 92.88% |
+|       64 |   16384 |        32 |           32 |       128 |       256 |   16.000 GiB |   512.000 KiB |        16385 | 1048576 |     26x |  19.804 ms |  2.00% |  19.721 ms |  0.10% | 53.171M | 871.212 GB/s | 93.37% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=128 seq_len=32 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.288189ms GPU, 0.295528ms CPU, 0.50s total GPU, 0.61s total wall, 1744x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=128 seq_len=64 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.263584ms GPU, 0.271579ms CPU, 0.61s total GPU, 0.73s total wall, 2304x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=128 seq_len=128 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.360383ms GPU, 0.367908ms CPU, 0.50s total GPU, 0.58s total wall, 1388x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=128 seq_len=256 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.684315ms GPU, 0.695213ms CPU, 0.50s total GPU, 0.54s total wall, 731x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=128 seq_len=512 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 1.311800ms GPU, 1.335920ms CPU, 0.50s total GPU, 0.53s total wall, 382x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=128 seq_len=1024 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 2.510572ms GPU, 2.517299ms CPU, 0.50s total GPU, 0.51s total wall, 200x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=128 seq_len=2048 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 4.963450ms GPU, 4.987119ms CPU, 0.50s total GPU, 0.51s total wall, 101x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=128 seq_len=4096 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 9.820060ms GPU, 9.833040ms CPU, 0.50s total GPU, 0.50s total wall, 51x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=128 seq_len=8192 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 19.565450ms GPU, 19.573070ms CPU, 0.51s total GPU, 0.51s total wall, 26x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=128 seq_len=16384 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
 Skip: seq_len too long to fit into the benchmark preset
-Run:  [12/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=65536 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Skip: seq_len too long to fit into the benchmark preset
 ```
 
 # Benchmark Results
@@ -180,19 +776,24 @@ Skip: seq_len too long to fit into the benchmark preset
 
 ### [0] NVIDIA A30
 
-| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size |    Read     |    Write    | Samples |  CPU Time  | Noise  |  GPU Time  | Noise  | GlobalMem BW | BWUtil |
-|----------|---------|-----------|--------------|-----------|-----------|-------------|-------------|---------|------------|--------|------------|--------|--------------|--------|
-|       64 |      32 |        32 |           32 |       128 |       256 |  32.500 MiB | 512.000 KiB |   3200x | 164.139 us | 26.04% | 156.429 us | 19.20% | 221.206 GB/s | 23.71% |
-|       64 |      64 |        32 |           32 |       128 |       256 |  64.500 MiB | 512.000 KiB |   3472x | 152.625 us | 38.47% | 144.429 us |  0.53% | 471.909 GB/s | 50.57% |
-|       64 |     128 |        32 |           32 |       128 |       256 | 128.500 MiB | 512.000 KiB |   2435x | 214.284 us | 35.80% | 205.407 us |  0.40% | 658.527 GB/s | 70.57% |
-|       64 |     256 |        32 |           32 |       128 |       256 | 256.500 MiB | 512.000 KiB |   1336x | 383.099 us | 17.16% | 374.437 us |  0.28% | 719.705 GB/s | 77.13% |
-|       64 |     512 |        32 |           32 |       128 |       256 | 512.500 MiB | 512.000 KiB |    717x | 708.812 us | 11.47% | 698.028 us |  0.27% | 770.627 GB/s | 82.59% |
-|       64 |    1024 |        32 |           32 |       128 |       256 |   1.000 GiB | 512.000 KiB |    384x |   1.319 ms | 11.26% |   1.305 ms |  0.19% | 823.584 GB/s | 88.26% |
-|       64 |    2048 |        32 |           32 |       128 |       256 |   2.000 GiB | 512.000 KiB |    197x |   2.556 ms |  0.32% |   2.549 ms |  0.18% | 842.950 GB/s | 90.34% |
-|       64 |    4096 |        32 |           32 |       128 |       256 |   4.000 GiB | 512.000 KiB |    100x |   5.023 ms |  0.30% |   5.015 ms |  0.14% | 856.686 GB/s | 91.81% |
-|       64 |    8192 |        32 |           32 |       128 |       256 |   8.000 GiB | 512.000 KiB |     51x |   9.918 ms |  0.13% |   9.911 ms |  0.11% | 866.820 GB/s | 92.89% |
-|       64 |   16384 |        32 |           32 |       128 |       256 |  16.000 GiB | 512.000 KiB |     26x |  19.763 ms |  0.82% |  19.724 ms |  0.09% | 871.066 GB/s | 93.35% |
-S=64 Hqo=32 Hkv=32 D=96  P=256 && ./build/flash_attention_benchmark -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P --disable-blocking-kernel --md "benchmark-$S-GQA$(( $Hqo / $Hkv ))-$P-$Hqo-$Hkv-$D.md"
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens  | Samples |  CPU Time  | Noise  |  GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|---------|---------|------------|--------|------------|--------|---------|--------------|--------|
+|      128 |      32 |        32 |           32 |       128 |       256 |   65.000 MiB |     1.000 MiB |        16385 |    4096 |   1744x | 295.528 us | 20.18% | 288.189 us | 19.36% | 14.213M | 240.141 GB/s | 25.74% |
+|      128 |      64 |        32 |           32 |       128 |       256 |  129.000 MiB |     1.000 MiB |        16385 |    8192 |   2304x | 271.579 us | 18.47% | 263.584 us |  0.52% | 31.079M | 517.160 GB/s | 55.42% |
+|      128 |     128 |        32 |           32 |       128 |       256 |  257.000 MiB |     1.000 MiB |        16385 |   16384 |   1388x | 367.908 us | 10.23% | 360.383 us |  0.25% | 45.463M | 750.681 GB/s | 80.45% |
+|      128 |     256 |        32 |           32 |       128 |       256 |  513.000 MiB |     1.000 MiB |        16385 |   32768 |    731x | 695.213 us | 12.05% | 684.315 us |  0.33% | 47.884M | 787.602 GB/s | 84.41% |
+|      128 |     512 |        32 |           32 |       128 |       256 |    1.001 GiB |     1.000 MiB |        16385 |   65536 |    382x |   1.336 ms | 23.33% |   1.312 ms |  0.18% | 49.959M | 820.124 GB/s | 87.89% |
+|      128 |    1024 |        32 |           32 |       128 |       256 |    2.001 GiB |     1.000 MiB |        16385 |  131072 |    200x |   2.517 ms |  0.29% |   2.511 ms |  0.11% | 52.208M | 856.212 GB/s | 91.76% |
+|      128 |    2048 |        32 |           32 |       128 |       256 |    4.001 GiB |     1.000 MiB |        16385 |  262144 |    101x |   4.987 ms |  3.45% |   4.963 ms |  0.11% | 52.815M | 865.742 GB/s | 92.78% |
+|      128 |    4096 |        32 |           32 |       128 |       256 |    8.001 GiB |     1.000 MiB |        16385 |  524288 |     51x |   9.833 ms |  0.47% |   9.820 ms |  0.07% | 53.389M | 874.947 GB/s | 93.77% |
+|      128 |    8192 |        32 |           32 |       128 |       256 |   16.001 GiB |     1.000 MiB |        16385 | 1048576 |     26x |  19.573 ms |  0.10% |  19.565 ms |  0.09% | 53.593M | 878.179 GB/s | 94.11% |
+
+# Page size impact tests
+for P in 128 256 512 1024; do
+  S=16 Hqo=32 Hkv=4 D=128 && ./build/flash_attention_benchmark \
+    -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P \
+    --disable-blocking-kernel --md "results/benchmark-pagesize-$P.md"
+done
 # Devices
 
 ## [0] `NVIDIA A30`
@@ -211,30 +812,26 @@ S=64 Hqo=32 Hkv=32 D=96  P=256 && ./build/flash_attention_benchmark -a num_seqs=
 # Log
 
 ```
-Run:  [1/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=32 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 0.122612ms GPU, 0.130241ms CPU, 0.50s total GPU, 0.74s total wall, 4080x 
-Run:  [2/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=64 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 0.124687ms GPU, 0.133373ms CPU, 0.50s total GPU, 0.72s total wall, 4016x 
-Run:  [3/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=128 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 0.164746ms GPU, 0.172661ms CPU, 0.50s total GPU, 0.67s total wall, 3040x 
-Run:  [4/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=256 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 0.285266ms GPU, 0.292859ms CPU, 0.50s total GPU, 0.59s total wall, 1753x 
-Run:  [5/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=512 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 0.589340ms GPU, 0.598033ms CPU, 0.50s total GPU, 0.55s total wall, 849x 
-Run:  [6/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=1024 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 1.210383ms GPU, 1.219206ms CPU, 0.50s total GPU, 0.53s total wall, 416x 
-Run:  [7/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=2048 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 2.437689ms GPU, 2.462720ms CPU, 1.72s total GPU, 1.77s total wall, 704x 
-Run:  [8/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=4096 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 4.921545ms GPU, 4.929177ms CPU, 0.50s total GPU, 0.51s total wall, 102x 
-Run:  [9/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=8192 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 9.865517ms GPU, 9.872166ms CPU, 0.50s total GPU, 0.51s total wall, 51x 
-Run:  [10/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=16384 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 19.773794ms GPU, 19.780713ms CPU, 0.51s total GPU, 0.52s total wall, 26x 
-Run:  [11/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=32768 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Skip: seq_len too long to fit into the benchmark preset
-Run:  [12/12] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=65536 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Skip: seq_len too long to fit into the benchmark preset
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=32 num_heads=32 num_kv_heads=4 head_size=128 page_size=128]
+Skip: OOM: Ð<–_P
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=64 num_heads=32 num_kv_heads=4 head_size=128 page_size=128]
+Skip: OOM: Ð<–_P
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=128 num_heads=32 num_kv_heads=4 head_size=128 page_size=128]
+Skip: OOM: Ð<–_P
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=256 num_heads=32 num_kv_heads=4 head_size=128 page_size=128]
+Skip: OOM: Ð<–_P
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=512 num_heads=32 num_kv_heads=4 head_size=128 page_size=128]
+Skip: OOM: Ð<–_P
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=1024 num_heads=32 num_kv_heads=4 head_size=128 page_size=128]
+Skip: OOM: Ð<–_P
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=2048 num_heads=32 num_kv_heads=4 head_size=128 page_size=128]
+Skip: OOM: Ð<–_P
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=4096 num_heads=32 num_kv_heads=4 head_size=128 page_size=128]
+Skip: OOM: Ð<–_P
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=8192 num_heads=32 num_kv_heads=4 head_size=128 page_size=128]
+Skip: OOM: Ð<–_P
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=16384 num_heads=32 num_kv_heads=4 head_size=128 page_size=128]
+Skip: OOM: Ð<–_P
 ```
 
 # Benchmark Results
@@ -243,20 +840,7 @@ Skip: seq_len too long to fit into the benchmark preset
 
 ### [0] NVIDIA A30
 
-| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size |    Read     |    Write    | Samples |  CPU Time  | Noise  |  GPU Time  | Noise  | GlobalMem BW | BWUtil |
-|----------|---------|-----------|--------------|-----------|-----------|-------------|-------------|---------|------------|--------|------------|--------|--------------|--------|
-|       64 |      32 |        32 |           32 |        96 |       256 |  24.375 MiB | 384.000 KiB |   4080x | 130.241 us | 30.82% | 122.612 us | 14.04% | 211.662 GB/s | 22.68% |
-|       64 |      64 |        32 |           32 |        96 |       256 |  48.375 MiB | 384.000 KiB |   4016x | 133.373 us | 45.35% | 124.687 us |  0.60% | 409.970 GB/s | 43.94% |
-|       64 |     128 |        32 |           32 |        96 |       256 |  96.375 MiB | 384.000 KiB |   3040x | 172.661 us | 30.46% | 164.746 us |  0.52% | 615.793 GB/s | 65.99% |
-|       64 |     256 |        32 |           32 |        96 |       256 | 192.375 MiB | 384.000 KiB |   1753x | 292.859 us | 14.01% | 285.266 us |  0.41% | 708.507 GB/s | 75.93% |
-|       64 |     512 |        32 |           32 |        96 |       256 | 384.375 MiB | 384.000 KiB |    849x | 598.033 us |  8.67% | 589.340 us |  0.32% | 684.561 GB/s | 73.36% |
-|       64 |    1024 |        32 |           32 |        96 |       256 | 768.375 MiB | 384.000 KiB |    416x |   1.219 ms |  3.61% |   1.210 ms |  0.69% | 665.982 GB/s | 71.37% |
-|       64 |    2048 |        32 |           32 |        96 |       256 |   1.500 GiB | 384.000 KiB |    704x |   2.463 ms | 14.12% |   2.438 ms |  0.66% | 661.036 GB/s | 70.84% |
-|       64 |    4096 |        32 |           32 |        96 |       256 |   3.000 GiB | 384.000 KiB |    102x |   4.929 ms |  0.33% |   4.922 ms |  0.23% | 654.675 GB/s | 70.16% |
-|       64 |    8192 |        32 |           32 |        96 |       256 |   6.000 GiB | 384.000 KiB |     51x |   9.872 ms |  0.11% |   9.866 ms |  0.08% | 653.107 GB/s | 69.99% |
-|       64 |   16384 |        32 |           32 |        96 |       256 |  12.000 GiB | 384.000 KiB |     26x |  19.781 ms |  0.07% |  19.774 ms |  0.06% | 651.655 GB/s | 69.84% |
-
-S=1  Hqo=64 Hkv=8  D=128 P=256 && ./build/flash_attention_benchmark -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P --disable-blocking-kernel --md "benchmark-$S-GQA$(( $Hqo / $Hkv ))-$P-$Hqo-$Hkv-$D.md"
+No data -- check log.
 # Devices
 
 ## [0] `NVIDIA A30`
@@ -275,30 +859,26 @@ S=1  Hqo=64 Hkv=8  D=128 P=256 && ./build/flash_attention_benchmark -a num_seqs=
 # Log
 
 ```
-Run:  [1/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=32 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.028375ms GPU, 0.035250ms CPU, 0.50s total GPU, 1.54s total wall, 17632x 
-Run:  [2/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=64 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.027172ms GPU, 0.033810ms CPU, 0.50s total GPU, 1.55s total wall, 18416x 
-Run:  [3/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=128 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.027189ms GPU, 0.033880ms CPU, 0.50s total GPU, 1.55s total wall, 18400x 
-Run:  [4/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=256 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.030222ms GPU, 0.036839ms CPU, 0.50s total GPU, 1.43s total wall, 16560x 
-Run:  [5/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.035712ms GPU, 0.042339ms CPU, 0.50s total GPU, 1.26s total wall, 14016x 
-Run:  [6/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.046745ms GPU, 0.053554ms CPU, 0.50s total GPU, 1.07s total wall, 10704x 
-Run:  [7/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.068940ms GPU, 0.076098ms CPU, 0.50s total GPU, 0.87s total wall, 7264x 
-Run:  [8/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.115427ms GPU, 0.122568ms CPU, 0.50s total GPU, 0.71s total wall, 4336x 
-Run:  [9/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.205945ms GPU, 0.213500ms CPU, 0.50s total GPU, 0.62s total wall, 2428x 
-Run:  [10/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=16384 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.381828ms GPU, 0.389678ms CPU, 0.50s total GPU, 0.56s total wall, 1310x 
-Run:  [11/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=32768 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.733932ms GPU, 0.742937ms CPU, 0.50s total GPU, 0.53s total wall, 682x 
-Run:  [12/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=65536 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 1.436264ms GPU, 1.471942ms CPU, 0.50s total GPU, 0.53s total wall, 349x 
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=32 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.029690ms GPU, 0.036666ms CPU, 0.50s total GPU, 1.48s total wall, 16848x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=64 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.029693ms GPU, 0.036563ms CPU, 0.50s total GPU, 1.44s total wall, 16848x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=128 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.032396ms GPU, 0.039273ms CPU, 0.50s total GPU, 1.35s total wall, 15440x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=256 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.040070ms GPU, 0.046777ms CPU, 0.50s total GPU, 1.16s total wall, 12480x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=512 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.054619ms GPU, 0.062854ms CPU, 0.50s total GPU, 0.97s total wall, 9168x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=1024 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.082574ms GPU, 0.089843ms CPU, 0.50s total GPU, 0.80s total wall, 6064x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=2048 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.123385ms GPU, 0.130416ms CPU, 0.50s total GPU, 0.70s total wall, 4064x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=4096 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.206075ms GPU, 0.212737ms CPU, 0.50s total GPU, 0.62s total wall, 2432x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=8192 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.372058ms GPU, 0.380278ms CPU, 1.20s total GPU, 1.36s total wall, 3232x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=16384 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.698607ms GPU, 0.707257ms CPU, 0.50s total GPU, 0.54s total wall, 720x 
 ```
 
 # Benchmark Results
@@ -307,21 +887,18 @@ Pass: Cold: 1.436264ms GPU, 1.471942ms CPU, 0.50s total GPU, 0.53s total wall, 3
 
 ### [0] NVIDIA A30
 
-| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size |    Read     |   Write    | Samples |  CPU Time  | Noise  |  GPU Time  | Noise  | GlobalMem BW | BWUtil |
-|----------|---------|-----------|--------------|-----------|-----------|-------------|------------|---------|------------|--------|------------|--------|--------------|--------|
-|        1 |      32 |        64 |            8 |       128 |       256 | 144.000 KiB | 16.000 KiB |  17632x |  35.250 us | 58.12% |  28.375 us | 52.08% |   5.774 GB/s |  0.62% |
-|        1 |      64 |        64 |            8 |       128 |       256 | 272.000 KiB | 16.000 KiB |  18416x |  33.810 us | 80.29% |  27.172 us | 76.47% |  10.853 GB/s |  1.16% |
-|        1 |     128 |        64 |            8 |       128 |       256 | 528.000 KiB | 16.000 KiB |  18400x |  33.880 us | 45.56% |  27.189 us | 37.38% |  20.489 GB/s |  2.20% |
-|        1 |     256 |        64 |            8 |       128 |       256 |   1.016 MiB | 16.000 KiB |  16560x |  36.839 us | 22.04% |  30.222 us |  2.84% |  35.780 GB/s |  3.83% |
-|        1 |     512 |        64 |            8 |       128 |       256 |   2.016 MiB | 16.000 KiB |  14016x |  42.339 us | 18.66% |  35.712 us |  2.19% |  59.641 GB/s |  6.39% |
-|        1 |    1024 |        64 |            8 |       128 |       256 |   4.016 MiB | 16.000 KiB |  10704x |  53.554 us | 38.72% |  46.745 us |  1.93% |  90.427 GB/s |  9.69% |
-|        1 |    2048 |        64 |            8 |       128 |       256 |   8.016 MiB | 16.000 KiB |   7264x |  76.098 us | 31.45% |  68.940 us |  1.57% | 122.155 GB/s | 13.09% |
-|        1 |    4096 |        64 |            8 |       128 |       256 |  16.016 MiB | 16.000 KiB |   4336x | 122.568 us | 23.54% | 115.427 us |  0.70% | 145.633 GB/s | 15.61% |
-|        1 |    8192 |        64 |            8 |       128 |       256 |  32.016 MiB | 16.000 KiB |   2428x | 213.500 us | 19.13% | 205.945 us |  0.43% | 163.088 GB/s | 17.48% |
-|        1 |   16384 |        64 |            8 |       128 |       256 |  64.016 MiB | 16.000 KiB |   1310x | 389.678 us | 10.58% | 381.828 us |  0.24% | 175.842 GB/s | 18.84% |
-|        1 |   32768 |        64 |            8 |       128 |       256 | 128.016 MiB | 16.000 KiB |    682x | 742.937 us |  7.83% | 733.932 us |  0.15% | 182.920 GB/s | 19.60% |
-|        1 |   65536 |        64 |            8 |       128 |       256 | 256.016 MiB | 16.000 KiB |    349x |   1.472 ms | 37.58% |   1.436 ms |  0.18% | 186.921 GB/s | 20.03% |
-S=1  Hqo=32 Hkv=8  D=128 P=256 && ./build/flash_attention_benchmark -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P --disable-blocking-kernel --md "benchmark-$S-GQA$(( $Hqo / $Hkv ))-$P-$Hqo-$Hkv-$D.md"
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  |  Noise  |  GPU Time  |  Noise  |  Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|---------|------------|---------|----------|--------------|--------|
+|       16 |      32 |        32 |            4 |       128 |       256 |    1.125 MiB |   128.000 KiB |       2048.1 |    512 |  16848x |  36.666 us |  27.87% |  29.690 us |  11.57% |  17.245M |  44.146 GB/s |  4.73% |
+|       16 |      64 |        32 |            4 |       128 |       256 |    2.125 MiB |   128.000 KiB |       2048.1 |   1024 |  16848x |  36.563 us |  61.24% |  29.693 us |  13.96% |  34.486M |  79.456 GB/s |  8.52% |
+|       16 |     128 |        32 |            4 |       128 |       256 |    4.125 MiB |   128.000 KiB |       2048.1 |   2048 |  15440x |  39.273 us |  69.80% |  32.396 us |  42.69% |  63.217M | 137.561 GB/s | 14.74% |
+|       16 |     256 |        32 |            4 |       128 |       256 |    8.125 MiB |   128.000 KiB |       2048.1 |   4096 |  12480x |  46.777 us | 160.77% |  40.070 us | 159.88% | 102.220M | 215.889 GB/s | 23.14% |
+|       16 |     512 |        32 |            4 |       128 |       256 |   16.125 MiB |   128.000 KiB |       2048.1 |   8192 |   9168x |  62.854 us | 174.40% |  54.619 us |   1.99% | 149.985M | 311.969 GB/s | 33.43% |
+|       16 |    1024 |        32 |            4 |       128 |       256 |   32.125 MiB |   128.000 KiB |       2048.1 |  16384 |   6064x |  89.843 us |  39.97% |  82.574 us |   1.28% | 198.416M | 409.531 GB/s | 43.89% |
+|       16 |    2048 |        32 |            4 |       128 |       256 |   64.125 MiB |   128.000 KiB |       2048.1 |  32768 |   4064x | 130.416 us |  20.33% | 123.385 us |   1.27% | 265.576M | 546.024 GB/s | 58.52% |
+|       16 |    4096 |        32 |            4 |       128 |       256 |  128.125 MiB |   128.000 KiB |       2048.1 |  65536 |   2432x | 212.737 us |   3.43% | 206.075 us |   1.17% | 318.020M | 652.577 GB/s | 69.94% |
+|       16 |    8192 |        32 |            4 |       128 |       256 |  256.125 MiB |   128.000 KiB |       2048.1 | 131072 |   3232x | 380.278 us |  15.82% | 372.058 us |   8.76% | 352.289M | 722.193 GB/s | 77.40% |
+|       16 |   16384 |        32 |            4 |       128 |       256 |  512.125 MiB |   128.000 KiB |       2048.1 | 262144 |    720x | 707.257 us |   7.68% | 698.607 us |   0.63% | 375.238M | 768.863 GB/s | 82.40% |
 # Devices
 
 ## [0] `NVIDIA A30`
@@ -340,30 +917,26 @@ S=1  Hqo=32 Hkv=8  D=128 P=256 && ./build/flash_attention_benchmark -a num_seqs=
 # Log
 
 ```
-Run:  [1/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=32 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.028154ms GPU, 0.035383ms CPU, 0.50s total GPU, 1.55s total wall, 17760x 
-Run:  [2/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=64 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.027126ms GPU, 0.034230ms CPU, 0.50s total GPU, 1.55s total wall, 18448x 
-Run:  [3/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=128 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.027423ms GPU, 0.034402ms CPU, 0.50s total GPU, 1.55s total wall, 18336x 
-Run:  [4/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=256 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.030637ms GPU, 0.037343ms CPU, 0.50s total GPU, 1.41s total wall, 16336x 
-Run:  [5/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.036033ms GPU, 0.042922ms CPU, 0.50s total GPU, 1.27s total wall, 13888x 
-Run:  [6/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.047200ms GPU, 0.053927ms CPU, 0.50s total GPU, 1.05s total wall, 10608x 
-Run:  [7/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.068930ms GPU, 0.076246ms CPU, 0.50s total GPU, 0.86s total wall, 7264x 
-Run:  [8/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.116578ms GPU, 0.123274ms CPU, 0.50s total GPU, 0.72s total wall, 4304x 
-Run:  [9/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.206797ms GPU, 0.214161ms CPU, 0.50s total GPU, 0.62s total wall, 2432x 
-Run:  [10/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=16384 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.382452ms GPU, 0.390246ms CPU, 0.50s total GPU, 0.56s total wall, 1308x 
-Run:  [11/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 0.734028ms GPU, 0.742372ms CPU, 0.50s total GPU, 0.53s total wall, 682x 
-Run:  [12/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=65536 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
-Pass: Cold: 1.436255ms GPU, 1.445161ms CPU, 0.50s total GPU, 0.52s total wall, 349x 
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=32 num_heads=32 num_kv_heads=4 head_size=128 page_size=512]
+Pass: Cold: 0.030139ms GPU, 0.037359ms CPU, 0.50s total GPU, 1.47s total wall, 16592x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=64 num_heads=32 num_kv_heads=4 head_size=128 page_size=512]
+Pass: Cold: 0.030182ms GPU, 0.037015ms CPU, 0.50s total GPU, 1.43s total wall, 16576x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=128 num_heads=32 num_kv_heads=4 head_size=128 page_size=512]
+Pass: Cold: 0.033155ms GPU, 0.039802ms CPU, 0.50s total GPU, 1.33s total wall, 15088x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=256 num_heads=32 num_kv_heads=4 head_size=128 page_size=512]
+Pass: Cold: 0.040209ms GPU, 0.047770ms CPU, 0.50s total GPU, 1.17s total wall, 12448x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=512 num_heads=32 num_kv_heads=4 head_size=128 page_size=512]
+Pass: Cold: 0.055129ms GPU, 0.062438ms CPU, 0.50s total GPU, 0.96s total wall, 9072x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=1024 num_heads=32 num_kv_heads=4 head_size=128 page_size=512]
+Pass: Cold: 0.084510ms GPU, 0.091466ms CPU, 0.50s total GPU, 0.79s total wall, 5920x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=2048 num_heads=32 num_kv_heads=4 head_size=128 page_size=512]
+Pass: Cold: 0.123751ms GPU, 0.131300ms CPU, 0.50s total GPU, 0.71s total wall, 4048x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=4096 num_heads=32 num_kv_heads=4 head_size=128 page_size=512]
+Pass: Cold: 0.205848ms GPU, 0.213053ms CPU, 0.50s total GPU, 0.62s total wall, 2432x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=8192 num_heads=32 num_kv_heads=4 head_size=128 page_size=512]
+Pass: Cold: 0.370908ms GPU, 0.380105ms CPU, 0.50s total GPU, 0.57s total wall, 1360x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=16384 num_heads=32 num_kv_heads=4 head_size=128 page_size=512]
+Pass: Cold: 0.697175ms GPU, 0.719644ms CPU, 0.50s total GPU, 0.55s total wall, 720x 
 ```
 
 # Benchmark Results
@@ -372,21 +945,18 @@ Pass: Cold: 1.436255ms GPU, 1.445161ms CPU, 0.50s total GPU, 0.52s total wall, 3
 
 ### [0] NVIDIA A30
 
-| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size |    Read     |   Write   | Samples |  CPU Time  |  Noise  |  GPU Time  | Noise  | GlobalMem BW | BWUtil |
-|----------|---------|-----------|--------------|-----------|-----------|-------------|-----------|---------|------------|---------|------------|--------|--------------|--------|
-|        1 |      32 |        32 |            8 |       128 |       256 | 136.000 KiB | 8.000 KiB |  17760x |  35.383 us |  88.93% |  28.154 us | 11.83% |   5.237 GB/s |  0.56% |
-|        1 |      64 |        32 |            8 |       128 |       256 | 264.000 KiB | 8.000 KiB |  18448x |  34.230 us | 116.59% |  27.126 us |  2.73% |  10.268 GB/s |  1.10% |
-|        1 |     128 |        32 |            8 |       128 |       256 | 520.000 KiB | 8.000 KiB |  18336x |  34.402 us | 157.96% |  27.423 us | 75.78% |  19.716 GB/s |  2.11% |
-|        1 |     256 |        32 |            8 |       128 |       256 |   1.008 MiB | 8.000 KiB |  16336x |  37.343 us |  63.27% |  30.637 us | 59.34% |  34.761 GB/s |  3.73% |
-|        1 |     512 |        32 |            8 |       128 |       256 |   2.008 MiB | 8.000 KiB |  13888x |  42.922 us |  22.56% |  36.033 us |  2.38% |  58.656 GB/s |  6.29% |
-|        1 |    1024 |        32 |            8 |       128 |       256 |   4.008 MiB | 8.000 KiB |  10608x |  53.927 us |  35.92% |  47.200 us | 32.97% |  89.209 GB/s |  9.56% |
-|        1 |    2048 |        32 |            8 |       128 |       256 |   8.008 MiB | 8.000 KiB |   7264x |  76.246 us |  43.65% |  68.930 us |  1.49% | 121.934 GB/s | 13.07% |
-|        1 |    4096 |        32 |            8 |       128 |       256 |  16.008 MiB | 8.000 KiB |   4304x | 123.274 us |   5.84% | 116.578 us |  1.11% | 144.054 GB/s | 15.44% |
-|        1 |    8192 |        32 |            8 |       128 |       256 |  32.008 MiB | 8.000 KiB |   2432x | 214.161 us |  17.67% | 206.797 us |  0.50% | 162.337 GB/s | 17.40% |
-|        1 |   16384 |        32 |            8 |       128 |       256 |  64.008 MiB | 8.000 KiB |   1308x | 390.246 us |  11.27% | 382.452 us |  0.27% | 175.513 GB/s | 18.81% |
-|        1 |   32768 |        32 |            8 |       128 |       256 | 128.008 MiB | 8.000 KiB |    682x | 742.372 us |   5.42% | 734.028 us |  0.15% | 182.873 GB/s | 19.60% |
-|        1 |   65536 |        32 |            8 |       128 |       256 | 256.008 MiB | 8.000 KiB |    349x |   1.445 ms |   2.88% |   1.436 ms |  0.10% | 186.911 GB/s | 20.03% |
-S=1  Hqo=32 Hkv=32 D=128 P=256 && ./build/flash_attention_benchmark -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P --disable-blocking-kernel --md "benchmark-$S-GQA$(( $Hqo / $Hkv ))-$P-$Hqo-$Hkv-$D.md"
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  |  Noise  |  GPU Time  |  Noise  |  Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|---------|------------|---------|----------|--------------|--------|
+|       16 |      32 |        32 |            4 |       128 |       512 |    1.125 MiB |   128.000 KiB |       2048.1 |    512 |  16592x |  37.359 us |  43.00% |  30.139 us |  11.24% |  16.988M |  43.489 GB/s |  4.66% |
+|       16 |      64 |        32 |            4 |       128 |       512 |    2.125 MiB |   128.000 KiB |       2048.1 |   1024 |  16576x |  37.015 us |  46.88% |  30.182 us |   3.18% |  33.927M |  78.168 GB/s |  8.38% |
+|       16 |     128 |        32 |            4 |       128 |       512 |    4.125 MiB |   128.000 KiB |       2048.1 |   2048 |  15088x |  39.802 us |  59.77% |  33.155 us |  56.29% |  61.770M | 134.412 GB/s | 14.40% |
+|       16 |     256 |        32 |            4 |       128 |       512 |    8.125 MiB |   128.000 KiB |       2048.1 |   4096 |  12448x |  47.770 us | 152.05% |  40.209 us |   3.18% | 101.867M | 215.142 GB/s | 23.06% |
+|       16 |     512 |        32 |            4 |       128 |       512 |   16.125 MiB |   128.000 KiB |       2048.1 |   8192 |   9072x |  62.438 us |  64.03% |  55.129 us |  34.57% | 148.598M | 309.083 GB/s | 33.12% |
+|       16 |    1024 |        32 |            4 |       128 |       512 |   32.125 MiB |   128.000 KiB |       2048.1 |  16384 |   5920x |  91.466 us | 157.94% |  84.510 us | 156.61% | 193.871M | 400.149 GB/s | 42.88% |
+|       16 |    2048 |        32 |            4 |       128 |       512 |   64.125 MiB |   128.000 KiB |       2048.1 |  32768 |   4048x | 131.300 us |  31.44% | 123.751 us |   1.70% | 264.789M | 544.407 GB/s | 58.34% |
+|       16 |    4096 |        32 |            4 |       128 |       512 |  128.125 MiB |   128.000 KiB |       2048.1 |  65536 |   2432x | 213.053 us |  11.45% | 205.848 us |   1.00% | 318.371M | 653.297 GB/s | 70.01% |
+|       16 |    8192 |        32 |            4 |       128 |       512 |  256.125 MiB |   128.000 KiB |       2048.1 | 131072 |   1360x | 380.105 us |  17.56% | 370.908 us |   0.74% | 353.382M | 724.432 GB/s | 77.64% |
+|       16 |   16384 |        32 |            4 |       128 |       512 |  512.125 MiB |   128.000 KiB |       2048.1 | 262144 |    720x | 719.644 us |  52.04% | 697.175 us |   0.65% | 376.009M | 770.442 GB/s | 82.57% |
 # Devices
 
 ## [0] `NVIDIA A30`
@@ -405,30 +975,26 @@ S=1  Hqo=32 Hkv=32 D=128 P=256 && ./build/flash_attention_benchmark -a num_seqs=
 # Log
 
 ```
-Run:  [1/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=32 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 0.024856ms GPU, 0.031889ms CPU, 0.50s total GPU, 1.82s total wall, 20128x 
-Run:  [2/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=64 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 0.024577ms GPU, 0.031348ms CPU, 0.50s total GPU, 1.78s total wall, 20352x 
-Run:  [3/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=128 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 0.026241ms GPU, 0.033021ms CPU, 0.50s total GPU, 1.70s total wall, 19056x 
-Run:  [4/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=256 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 0.030070ms GPU, 0.036830ms CPU, 0.50s total GPU, 1.52s total wall, 16640x 
-Run:  [5/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 0.038354ms GPU, 0.045125ms CPU, 0.50s total GPU, 1.27s total wall, 13040x 
-Run:  [6/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 0.055690ms GPU, 0.062659ms CPU, 0.50s total GPU, 1.01s total wall, 8992x 
-Run:  [7/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 0.085151ms GPU, 0.092171ms CPU, 0.50s total GPU, 0.82s total wall, 5872x 
-Run:  [8/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 0.128874ms GPU, 0.135557ms CPU, 0.50s total GPU, 0.71s total wall, 3888x 
-Run:  [9/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 0.219525ms GPU, 0.226774ms CPU, 0.50s total GPU, 0.62s total wall, 2288x 
-Run:  [10/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=16384 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 0.400986ms GPU, 0.407718ms CPU, 0.50s total GPU, 0.57s total wall, 1247x 
-Run:  [11/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=32768 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 0.764189ms GPU, 0.772230ms CPU, 0.50s total GPU, 0.54s total wall, 655x 
-Run:  [12/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=65536 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
-Pass: Cold: 1.494175ms GPU, 1.503893ms CPU, 0.50s total GPU, 0.52s total wall, 335x 
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=32 num_heads=32 num_kv_heads=4 head_size=128 page_size=1024]
+Pass: Cold: 0.030272ms GPU, 0.037408ms CPU, 0.50s total GPU, 1.47s total wall, 16528x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=64 num_heads=32 num_kv_heads=4 head_size=128 page_size=1024]
+Pass: Cold: 0.029888ms GPU, 0.036675ms CPU, 0.50s total GPU, 1.43s total wall, 16736x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=128 num_heads=32 num_kv_heads=4 head_size=128 page_size=1024]
+Pass: Cold: 0.032424ms GPU, 0.039179ms CPU, 0.50s total GPU, 1.34s total wall, 15424x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=256 num_heads=32 num_kv_heads=4 head_size=128 page_size=1024]
+Pass: Cold: 0.040476ms GPU, 0.046845ms CPU, 0.52s total GPU, 1.20s total wall, 12848x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=512 num_heads=32 num_kv_heads=4 head_size=128 page_size=1024]
+Pass: Cold: 0.054871ms GPU, 0.062053ms CPU, 0.50s total GPU, 0.96s total wall, 9120x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=1024 num_heads=32 num_kv_heads=4 head_size=128 page_size=1024]
+Pass: Cold: 0.083229ms GPU, 0.090094ms CPU, 0.50s total GPU, 0.80s total wall, 6016x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=2048 num_heads=32 num_kv_heads=4 head_size=128 page_size=1024]
+Pass: Cold: 0.123856ms GPU, 0.130888ms CPU, 0.50s total GPU, 0.70s total wall, 4048x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=4096 num_heads=32 num_kv_heads=4 head_size=128 page_size=1024]
+Pass: Cold: 0.206075ms GPU, 0.213303ms CPU, 0.50s total GPU, 0.62s total wall, 2432x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=8192 num_heads=32 num_kv_heads=4 head_size=128 page_size=1024]
+Pass: Cold: 0.370510ms GPU, 0.378169ms CPU, 0.50s total GPU, 0.57s total wall, 1360x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=16384 num_heads=32 num_kv_heads=4 head_size=128 page_size=1024]
+Pass: Cold: 0.696412ms GPU, 0.703066ms CPU, 0.50s total GPU, 0.53s total wall, 720x 
 ```
 
 # Benchmark Results
@@ -437,21 +1003,25 @@ Pass: Cold: 1.494175ms GPU, 1.503893ms CPU, 0.50s total GPU, 0.52s total wall, 3
 
 ### [0] NVIDIA A30
 
-| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size |    Read     |   Write   | Samples |  CPU Time  |  Noise  |  GPU Time  |  Noise  | GlobalMem BW | BWUtil |
-|----------|---------|-----------|--------------|-----------|-----------|-------------|-----------|---------|------------|---------|------------|---------|--------------|--------|
-|        1 |      32 |        32 |           32 |       128 |       256 | 520.000 KiB | 8.000 KiB |  20128x |  31.889 us |  67.87% |  24.856 us |   9.62% |  21.752 GB/s |  2.33% |
-|        1 |      64 |        32 |           32 |       128 |       256 |   1.008 MiB | 8.000 KiB |  20352x |  31.348 us |  27.82% |  24.577 us |   4.15% |  43.331 GB/s |  4.64% |
-|        1 |     128 |        32 |           32 |       128 |       256 |   2.008 MiB | 8.000 KiB |  19056x |  33.021 us |  27.00% |  26.241 us |   2.69% |  80.544 GB/s |  8.63% |
-|        1 |     256 |        32 |           32 |       128 |       256 |   4.008 MiB | 8.000 KiB |  16640x |  36.830 us |  22.66% |  30.070 us |   3.05% | 140.028 GB/s | 15.01% |
-|        1 |     512 |        32 |           32 |       128 |       256 |   8.008 MiB | 8.000 KiB |  13040x |  45.125 us |  17.75% |  38.354 us |   2.04% | 219.144 GB/s | 23.49% |
-|        1 |    1024 |        32 |           32 |       128 |       256 |  16.008 MiB | 8.000 KiB |   8992x |  62.659 us |  14.52% |  55.690 us |   1.56% | 301.557 GB/s | 32.32% |
-|        1 |    2048 |        32 |           32 |       128 |       256 |  32.008 MiB | 8.000 KiB |   5872x |  92.171 us | 134.82% |  85.151 us | 131.98% | 394.251 GB/s | 42.25% |
-|        1 |    4096 |        32 |           32 |       128 |       256 |  64.008 MiB | 8.000 KiB |   3888x | 135.557 us |   5.46% | 128.874 us |   1.73% | 520.861 GB/s | 55.82% |
-|        1 |    8192 |        32 |           32 |       128 |       256 | 128.008 MiB | 8.000 KiB |   2288x | 226.774 us |  12.60% | 219.525 us |   0.60% | 611.476 GB/s | 65.53% |
-|        1 |   16384 |        32 |           32 |       128 |       256 | 256.008 MiB | 8.000 KiB |   1247x | 407.718 us |   1.73% | 400.986 us |   0.41% | 669.479 GB/s | 71.75% |
-|        1 |   32768 |        32 |           32 |       128 |       256 | 512.008 MiB | 8.000 KiB |    655x | 772.230 us |   4.40% | 764.189 us |   0.30% | 702.559 GB/s | 75.29% |
-|        1 |   65536 |        32 |           32 |       128 |       256 |   1.000 GiB | 8.000 KiB |    335x |   1.504 ms |   3.65% |   1.494 ms |   0.21% | 718.630 GB/s | 77.01% |
-S=1  Hqo=32 Hkv=32 D=96  P=256 && ./build/flash_attention_benchmark -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P --disable-blocking-kernel --md "benchmark-$S-GQA$(( $Hqo / $Hkv ))-$P-$Hqo-$Hkv-$D.md"
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  | Noise  |  GPU Time  |  Noise  |  Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|--------|------------|---------|----------|--------------|--------|
+|       16 |      32 |        32 |            4 |       128 |      1024 |    1.125 MiB |   128.000 KiB |       2048.1 |    512 |  16528x |  37.408 us | 28.33% |  30.272 us |  11.66% |  16.913M |  43.298 GB/s |  4.64% |
+|       16 |      64 |        32 |            4 |       128 |      1024 |    2.125 MiB |   128.000 KiB |       2048.1 |   1024 |  16736x |  36.675 us | 48.32% |  29.888 us |  42.53% |  34.261M |  78.937 GB/s |  8.46% |
+|       16 |     128 |        32 |            4 |       128 |      1024 |    4.125 MiB |   128.000 KiB |       2048.1 |   2048 |  15424x |  39.179 us | 20.92% |  32.424 us |   2.35% |  63.163M | 137.443 GB/s | 14.73% |
+|       16 |     256 |        32 |            4 |       128 |      1024 |    8.125 MiB |   128.000 KiB |       2048.1 |   4096 |  12848x |  46.845 us | 77.85% |  40.476 us | 171.11% | 101.196M | 213.725 GB/s | 22.90% |
+|       16 |     512 |        32 |            4 |       128 |      1024 |   16.125 MiB |   128.000 KiB |       2048.1 |   8192 |   9120x |  62.053 us | 39.36% |  54.871 us |   2.41% | 149.294M | 310.532 GB/s | 33.28% |
+|       16 |    1024 |        32 |            4 |       128 |      1024 |   32.125 MiB |   128.000 KiB |       2048.1 |  16384 |   6016x |  90.094 us | 28.11% |  83.229 us |   1.26% | 196.855M | 406.308 GB/s | 43.54% |
+|       16 |    2048 |        32 |            4 |       128 |      1024 |   64.125 MiB |   128.000 KiB |       2048.1 |  32768 |   4048x | 130.888 us | 23.57% | 123.856 us |   1.26% | 264.566M | 543.948 GB/s | 58.29% |
+|       16 |    4096 |        32 |            4 |       128 |      1024 |  128.125 MiB |   128.000 KiB |       2048.1 |  65536 |   2432x | 213.303 us | 16.26% | 206.075 us |   1.01% | 318.020M | 652.576 GB/s | 69.93% |
+|       16 |    8192 |        32 |            4 |       128 |      1024 |  256.125 MiB |   128.000 KiB |       2048.1 | 131072 |   1360x | 378.169 us | 10.77% | 370.510 us |   0.76% | 353.761M | 725.210 GB/s | 77.72% |
+|       16 |   16384 |        32 |            4 |       128 |      1024 |  512.125 MiB |   128.000 KiB |       2048.1 | 262144 |    720x | 703.066 us |  1.13% | 696.412 us |   0.60% | 376.421M | 771.286 GB/s | 82.66% |
+
+# Sequence length scaling for long context (focused test)
+S=1 Hqo=32 Hkv=8 D=128 P=256 && for L in 1024 2048 4096 8192 16384 32768; do
+  ./build/flash_attention_benchmark \
+    -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P \
+    -a seq_len=$L --disable-blocking-kernel --md "results/benchmark-seqlen-$L.md"
+done
 # Devices
 
 ## [0] `NVIDIA A30`
@@ -470,30 +1040,8 @@ S=1  Hqo=32 Hkv=32 D=96  P=256 && ./build/flash_attention_benchmark -a num_seqs=
 # Log
 
 ```
-Run:  [1/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=32 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 0.023829ms GPU, 0.030751ms CPU, 0.50s total GPU, 1.88s total wall, 20992x 
-Run:  [2/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=64 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 0.024332ms GPU, 0.031118ms CPU, 0.50s total GPU, 1.81s total wall, 20560x 
-Run:  [3/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=128 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 0.025406ms GPU, 0.032064ms CPU, 0.50s total GPU, 1.76s total wall, 19696x 
-Run:  [4/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=256 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 0.029338ms GPU, 0.036224ms CPU, 0.50s total GPU, 1.55s total wall, 17056x 
-Run:  [5/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 0.036274ms GPU, 0.043713ms CPU, 0.50s total GPU, 1.34s total wall, 13792x 
-Run:  [6/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 0.052306ms GPU, 0.059184ms CPU, 0.50s total GPU, 1.05s total wall, 9568x 
-Run:  [7/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 0.080392ms GPU, 0.087012ms CPU, 0.50s total GPU, 0.85s total wall, 6224x 
-Run:  [8/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 0.123387ms GPU, 0.129946ms CPU, 0.50s total GPU, 0.72s total wall, 4064x 
-Run:  [9/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 0.213106ms GPU, 0.219800ms CPU, 0.67s total GPU, 0.84s total wall, 3136x 
-Run:  [10/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=16384 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 0.380236ms GPU, 0.388107ms CPU, 0.50s total GPU, 0.58s total wall, 1328x 
-Run:  [11/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=32768 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 0.722372ms GPU, 0.730927ms CPU, 0.50s total GPU, 0.54s total wall, 693x 
-Run:  [12/12] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=65536 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
-Pass: Cold: 1.408233ms GPU, 1.415102ms CPU, 0.50s total GPU, 0.52s total wall, 356x 
+Run:  [1/1] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.050501ms GPU, 0.057982ms CPU, 0.50s total GPU, 1.05s total wall, 9904x 
 ```
 
 # Benchmark Results
@@ -502,17 +1050,991 @@ Pass: Cold: 1.408233ms GPU, 1.415102ms CPU, 0.50s total GPU, 0.52s total wall, 3
 
 ### [0] NVIDIA A30
 
-| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size |    Read     |   Write   | Samples |  CPU Time  |  Noise  |  GPU Time  | Noise  | GlobalMem BW | BWUtil |
-|----------|---------|-----------|--------------|-----------|-----------|-------------|-----------|---------|------------|---------|------------|--------|--------------|--------|
-|        1 |      32 |        32 |           32 |        96 |       256 | 390.000 KiB | 6.000 KiB |  20992x |  30.751 us |  32.88% |  23.829 us |  8.49% |  17.017 GB/s |  1.82% |
-|        1 |      64 |        32 |           32 |        96 |       256 | 774.000 KiB | 6.000 KiB |  20560x |  31.118 us | 100.53% |  24.332 us | 60.71% |  32.826 GB/s |  3.52% |
-|        1 |     128 |        32 |           32 |        96 |       256 |   1.506 MiB | 6.000 KiB |  19696x |  32.064 us |  26.33% |  25.406 us |  3.03% |  62.394 GB/s |  6.69% |
-|        1 |     256 |        32 |           32 |        96 |       256 |   3.006 MiB | 6.000 KiB |  17056x |  36.224 us |  55.06% |  29.338 us |  2.59% | 107.642 GB/s | 11.54% |
-|        1 |     512 |        32 |           32 |        96 |       256 |   6.006 MiB | 6.000 KiB |  13792x |  43.713 us | 252.57% |  36.274 us |  4.77% | 173.783 GB/s | 18.62% |
-|        1 |    1024 |        32 |           32 |        96 |       256 |  12.006 MiB | 6.000 KiB |   9568x |  59.184 us |  42.05% |  52.306 us |  2.44% | 240.797 GB/s | 25.81% |
-|        1 |    2048 |        32 |           32 |        96 |       256 |  24.006 MiB | 6.000 KiB |   6224x |  87.012 us |   8.42% |  80.392 us |  1.80% | 313.193 GB/s | 33.56% |
-|        1 |    4096 |        32 |           32 |        96 |       256 |  48.006 MiB | 6.000 KiB |   4064x | 129.946 us |   5.44% | 123.387 us |  1.20% | 408.017 GB/s | 43.73% |
-|        1 |    8192 |        32 |           32 |        96 |       256 |  96.006 MiB | 6.000 KiB |   3136x | 219.800 us |  89.55% | 213.106 us | 89.49% | 472.421 GB/s | 50.63% |
-|        1 |   16384 |        32 |           32 |        96 |       256 | 192.006 MiB | 6.000 KiB |   1328x | 388.107 us |  10.82% | 380.236 us |  0.52% | 529.511 GB/s | 56.75% |
-|        1 |   32768 |        32 |           32 |        96 |       256 | 384.006 MiB | 6.000 KiB |    693x | 730.927 us |   6.59% | 722.372 us |  0.33% | 557.421 GB/s | 59.74% |
-|        1 |   65536 |        32 |           32 |        96 |       256 | 768.006 MiB | 6.000 KiB |    356x |   1.415 ms |   0.54% |   1.408 ms |  0.24% | 571.865 GB/s | 61.29% |
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples | CPU Time  | Noise  | GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|-----------|--------|-----------|--------|---------|--------------|--------|
+|        1 |    1024 |        32 |            8 |       128 |       256 |    4.008 MiB |     8.000 KiB |         4096 |   1024 |   9904x | 57.982 us | 44.33% | 50.501 us | 25.01% | 20.277M |  83.378 GB/s |  8.94% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/1] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.075642ms GPU, 0.082762ms CPU, 0.50s total GPU, 0.85s total wall, 6624x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples | CPU Time  | Noise  | GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|-----------|--------|-----------|--------|---------|--------------|--------|
+|        1 |    2048 |        32 |            8 |       128 |       256 |    8.008 MiB |     8.000 KiB |         4096 |   2048 |   6624x | 82.762 us | 18.52% | 75.642 us | 15.25% | 27.075M | 111.115 GB/s | 11.91% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/1] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.123933ms GPU, 0.131430ms CPU, 0.50s total GPU, 0.71s total wall, 4048x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  | Noise  |  GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|--------|------------|--------|---------|--------------|--------|
+|        1 |    4096 |        32 |            8 |       128 |       256 |   16.008 MiB |     8.000 KiB |         4096 |   4096 |   4048x | 131.430 us | 27.54% | 123.933 us | 15.94% | 33.050M | 135.506 GB/s | 14.52% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/1] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.237957ms GPU, 0.246508ms CPU, 0.50s total GPU, 0.62s total wall, 2112x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  | Noise  |  GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|--------|------------|--------|---------|--------------|--------|
+|        1 |    8192 |        32 |            8 |       128 |       256 |   32.008 MiB |     8.000 KiB |         4096 |   8192 |   2112x | 246.508 us | 30.50% | 237.957 us | 19.98% | 34.426M | 141.079 GB/s | 15.12% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/1] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=16384 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.429105ms GPU, 0.438405ms CPU, 0.50s total GPU, 0.56s total wall, 1168x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  | Noise  |  GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|--------|------------|--------|---------|--------------|--------|
+|        1 |   16384 |        32 |            8 |       128 |       256 |   64.008 MiB |     8.000 KiB |         4096 |  16384 |   1168x | 438.405 us | 23.71% | 429.105 us | 15.65% | 38.182M | 156.431 GB/s | 16.76% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/1] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.749394ms GPU, 0.759483ms CPU, 2.22s total GPU, 2.37s total wall, 2960x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  | Noise  |  GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|--------|------------|--------|---------|--------------|--------|
+|        1 |   32768 |        32 |            8 |       128 |       256 |  128.008 MiB |     8.000 KiB |         4096 |  32768 |   2960x | 759.483 us | 14.06% | 749.394 us | 10.51% | 43.726M | 179.124 GB/s | 19.20% |
+
+# Head dimension scaling test
+S=16 Hqo=32 Hkv=8 L=1024 P=256 && for D in 64 80 96 128 160; do
+  ./build/flash_attention_benchmark \
+    -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P \
+    -a seq_len=$L --disable-blocking-kernel --md "results/benchmark-headdim-$D.md"
+done
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/1] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=64 page_size=256]
+Pass: Cold: 0.084175ms GPU, 0.091575ms CPU, 0.50s total GPU, 0.81s total wall, 5952x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples | CPU Time  | Noise  | GPU Time  | Noise  |  Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|-----------|--------|-----------|--------|----------|--------------|--------|
+|       16 |    1024 |        32 |            8 |        64 |       256 |   32.062 MiB |    64.000 KiB |       2048.1 |  16384 |   5952x | 91.575 us | 35.03% | 84.175 us | 25.86% | 194.641M | 400.182 GB/s | 42.89% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/1] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=80 page_size=256]
+Pass: Cold: 0.112431ms GPU, 0.120645ms CPU, 0.50s total GPU, 0.73s total wall, 4448x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  | Noise  |  GPU Time  | Noise |  Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|--------|------------|-------|----------|--------------|--------|
+|       16 |    1024 |        32 |            8 |        80 |       256 |   40.078 MiB |    80.000 KiB |       2560.1 |  16384 |   4448x | 120.645 us | 47.92% | 112.431 us | 4.12% | 145.725M | 374.514 GB/s | 40.14% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/1] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=96 page_size=256]
+Pass: Cold: 0.114935ms GPU, 0.122327ms CPU, 0.50s total GPU, 0.73s total wall, 4352x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  | Noise  |  GPU Time  | Noise  |  Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|--------|------------|--------|----------|--------------|--------|
+|       16 |    1024 |        32 |            8 |        96 |       256 |   48.094 MiB |    96.000 KiB |       3072.1 |  16384 |   4352x | 122.327 us | 26.00% | 114.935 us | 10.14% | 142.551M | 439.626 GB/s | 47.11% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/1] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.136026ms GPU, 0.144199ms CPU, 0.50s total GPU, 0.70s total wall, 3680x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  | Noise  |  GPU Time  | Noise  |  Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|--------|------------|--------|----------|--------------|--------|
+|       16 |    1024 |        32 |            8 |       128 |       256 |   64.125 MiB |   128.000 KiB |       4096.1 |  16384 |   3680x | 144.199 us | 30.30% | 136.026 us | 24.92% | 120.448M | 495.281 GB/s | 53.08% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/1] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=160 page_size=256]
+Pass: Cold: 0.174104ms GPU, 0.182247ms CPU, 0.50s total GPU, 0.66s total wall, 2880x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  | Noise  |  GPU Time  | Noise | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|--------|------------|-------|---------|--------------|--------|
+|       16 |    1024 |        32 |            8 |       160 |       256 |   80.156 MiB |   160.000 KiB |       5120.2 |  16384 |   2880x | 182.247 us | 25.51% | 174.104 us | 7.55% | 94.105M | 483.699 GB/s | 51.84% |
+
+# Testing various GQA ratios with fixed total parameters
+S=16 L=1024 P=256 D=128 && for R in 1 2 4 8 16 32; do
+  Hqo=32 Hkv=$((Hqo / R))
+  ./build/flash_attention_benchmark \
+    -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P \
+    -a seq_len=$L --disable-blocking-kernel --md "results/benchmark-gqa-$R.md"
+done
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/1] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=1024 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.365827ms GPU, 0.373646ms CPU, 0.50s total GPU, 0.59s total wall, 1376x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  | Noise |  GPU Time  | Noise | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|-------|------------|-------|---------|--------------|--------|
+|       16 |    1024 |        32 |           32 |       128 |       256 |  256.125 MiB |   128.000 KiB |        16384 |  16384 |   1376x | 373.646 us | 7.53% | 365.827 us | 2.87% | 44.786M | 734.494 GB/s | 78.71% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/1] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=1024 num_heads=32 num_kv_heads=16 head_size=128 page_size=256]
+Pass: Cold: 0.205892ms GPU, 0.214013ms CPU, 0.50s total GPU, 0.65s total wall, 2432x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  | Noise  |  GPU Time  | Noise | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|--------|------------|-------|---------|--------------|--------|
+|       16 |    1024 |        32 |           16 |       128 |       256 |  128.125 MiB |   128.000 KiB |       8192.1 |  16384 |   2432x | 214.013 us | 19.63% | 205.892 us | 5.23% | 79.576M | 653.158 GB/s | 70.00% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/1] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.134874ms GPU, 0.142254ms CPU, 0.50s total GPU, 0.69s total wall, 3712x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  | Noise  |  GPU Time  | Noise |  Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|--------|------------|-------|----------|--------------|--------|
+|       16 |    1024 |        32 |            8 |       128 |       256 |   64.125 MiB |   128.000 KiB |       4096.1 |  16384 |   3712x | 142.254 us | 17.26% | 134.874 us | 6.32% | 121.477M | 499.512 GB/s | 53.53% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/1] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=1024 num_heads=32 num_kv_heads=4 head_size=128 page_size=256]
+Pass: Cold: 0.085096ms GPU, 0.092193ms CPU, 0.50s total GPU, 0.81s total wall, 5888x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples | CPU Time  | Noise  | GPU Time  | Noise |  Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|-----------|--------|-----------|-------|----------|--------------|--------|
+|       16 |    1024 |        32 |            4 |       128 |       256 |   32.125 MiB |   128.000 KiB |       2048.1 |  16384 |   5888x | 92.193 us | 10.19% | 85.096 us | 5.36% | 192.536M | 397.394 GB/s | 42.59% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/1] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=1024 num_heads=32 num_kv_heads=2 head_size=128 page_size=256]
+Pass: Cold: 0.057829ms GPU, 0.064929ms CPU, 0.50s total GPU, 0.96s total wall, 8656x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples | CPU Time  | Noise  | GPU Time  | Noise  |  Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|-----------|--------|-----------|--------|----------|--------------|--------|
+|       16 |    1024 |        32 |            2 |       128 |       256 |   16.125 MiB |   128.000 KiB |       1024.1 |  16384 |   8656x | 64.929 us | 33.16% | 57.829 us | 30.28% | 283.317M | 294.650 GB/s | 31.58% |
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/1] run_mha_varlen_fwd [Device=0 num_seqs=16 seq_len=1024 num_heads=32 num_kv_heads=1 head_size=128 page_size=256]
+Pass: Cold: 0.051654ms GPU, 0.059205ms CPU, 0.50s total GPU, 1.03s total wall, 9680x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples | CPU Time  | Noise  | GPU Time  | Noise  |  Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|-----------|--------|-----------|--------|----------|--------------|--------|
+|       16 |    1024 |        32 |            1 |       128 |       256 |    8.125 MiB |   128.000 KiB |       512.14 |  16384 |   9680x | 59.205 us | 51.20% | 51.654 us | 12.58% | 317.190M | 167.477 GB/s | 17.95% |
+
+# Original test cases for backward compatibility
+S=64 Hqo=64 Hkv=8  D=128 P=256 && ./build/flash_attention_benchmark -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P --disable-blocking-kernel --md "results/benchmark-$S-GQA$(( $Hqo / $Hkv ))-$P-$Hqo-$Hkv-$D.md"
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=32 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.048407ms GPU, 0.055527ms CPU, 0.50s total GPU, 1.06s total wall, 10336x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=64 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.052111ms GPU, 0.059063ms CPU, 0.50s total GPU, 0.99s total wall, 9600x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=128 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.071030ms GPU, 0.078085ms CPU, 0.50s total GPU, 0.85s total wall, 7040x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=256 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.113939ms GPU, 0.122402ms CPU, 0.52s total GPU, 0.75s total wall, 4592x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=512 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.192967ms GPU, 0.200375ms CPU, 0.50s total GPU, 0.62s total wall, 2592x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=1024 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.346738ms GPU, 0.354445ms CPU, 0.50s total GPU, 0.57s total wall, 1443x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=2048 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.650152ms GPU, 0.658199ms CPU, 0.50s total GPU, 0.54s total wall, 770x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=4096 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 1.260384ms GPU, 1.269971ms CPU, 0.50s total GPU, 0.52s total wall, 397x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=8192 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 2.483834ms GPU, 2.527987ms CPU, 0.50s total GPU, 0.52s total wall, 202x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=16384 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 4.929255ms GPU, 4.936101ms CPU, 0.50s total GPU, 0.51s total wall, 102x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens  | Samples |  CPU Time  | Noise  |  GPU Time  | Noise  |  Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|---------|---------|------------|--------|------------|--------|----------|--------------|--------|
+|       64 |      32 |        64 |            8 |       128 |       256 |    9.000 MiB |     1.000 MiB |         4097 |    2048 |  10336x |  55.527 us | 65.47% |  48.407 us | 43.57% |  42.308M | 216.614 GB/s | 23.21% |
+|       64 |      64 |        64 |            8 |       128 |       256 |   17.000 MiB |     1.000 MiB |         4097 |    4096 |   9600x |  59.063 us | 35.24% |  52.111 us |  1.66% |  78.601M | 362.195 GB/s | 38.82% |
+|       64 |     128 |        64 |            8 |       128 |       256 |   33.000 MiB |     1.000 MiB |         4097 |    8192 |   7040x |  78.085 us | 47.44% |  71.030 us |  1.84% | 115.332M | 501.926 GB/s | 53.79% |
+|       64 |     256 |        64 |            8 |       128 |       256 |   65.000 MiB |     1.000 MiB |         4097 |   16384 |   4592x | 122.402 us | 80.70% | 113.939 us |  1.19% | 143.797M | 607.398 GB/s | 65.09% |
+|       64 |     512 |        64 |            8 |       128 |       256 |  129.000 MiB |     1.000 MiB |         4097 |   32768 |   2592x | 200.375 us | 13.56% | 192.967 us |  0.82% | 169.812M | 706.417 GB/s | 75.70% |
+|       64 |    1024 |        64 |            8 |       128 |       256 |  257.000 MiB |     1.000 MiB |         4097 |   65536 |   1443x | 354.445 us | 10.74% | 346.738 us |  0.49% | 189.007M | 780.222 GB/s | 83.61% |
+|       64 |    2048 |        64 |            8 |       128 |       256 |  513.000 MiB |     1.000 MiB |         4097 |  131072 |    770x | 658.199 us |  5.65% | 650.152 us |  0.32% | 201.602M | 828.987 GB/s | 88.84% |
+|       64 |    4096 |        64 |            8 |       128 |       256 |    1.001 GiB |     1.000 MiB |         4097 |  262144 |    397x |   1.270 ms |  4.50% |   1.260 ms |  0.24% | 207.987M | 853.580 GB/s | 91.48% |
+|       64 |    8192 |        64 |            8 |       128 |       256 |    2.001 GiB |     1.000 MiB |         4097 |  524288 |    202x |   2.528 ms | 21.12% |   2.484 ms |  0.18% | 211.080M | 865.429 GB/s | 92.75% |
+|       64 |   16384 |        64 |            8 |       128 |       256 |    4.001 GiB |     1.000 MiB |         4097 | 1048576 |    102x |   4.936 ms |  0.18% |   4.929 ms |  0.11% | 212.725M | 871.747 GB/s | 93.42% |
+S=64 Hqo=32 Hkv=8  D=128 P=256 && ./build/flash_attention_benchmark -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P --disable-blocking-kernel --md "results/benchmark-$S-GQA$(( $Hqo / $Hkv ))-$P-$Hqo-$Hkv-$D.md"
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=32 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.048453ms GPU, 0.055742ms CPU, 0.50s total GPU, 1.07s total wall, 10320x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=64 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.050759ms GPU, 0.057889ms CPU, 0.50s total GPU, 1.01s total wall, 9856x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=128 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.070146ms GPU, 0.077139ms CPU, 0.50s total GPU, 0.86s total wall, 7136x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=256 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.112028ms GPU, 0.121345ms CPU, 0.50s total GPU, 0.72s total wall, 4464x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=512 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.190786ms GPU, 0.199334ms CPU, 0.50s total GPU, 0.63s total wall, 2624x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.344018ms GPU, 0.351423ms CPU, 0.59s total GPU, 0.68s total wall, 1728x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=2048 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.647285ms GPU, 0.656623ms CPU, 0.50s total GPU, 0.54s total wall, 773x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=4096 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 1.257361ms GPU, 1.271499ms CPU, 0.50s total GPU, 0.52s total wall, 398x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=8192 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 2.479256ms GPU, 2.521507ms CPU, 0.50s total GPU, 0.52s total wall, 202x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=16384 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 4.926504ms GPU, 4.934390ms CPU, 0.50s total GPU, 0.51s total wall, 102x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens  | Samples |  CPU Time  |  Noise  |  GPU Time  | Noise  |  Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|---------|---------|------------|---------|------------|--------|----------|--------------|--------|
+|       64 |      32 |        32 |            8 |       128 |       256 |    8.500 MiB |   512.000 KiB |       4096.5 |    2048 |  10320x |  55.742 us |  51.80% |  48.453 us | 22.45% |  42.267M | 194.768 GB/s | 20.87% |
+|       64 |      64 |        32 |            8 |       128 |       256 |   16.500 MiB |   512.000 KiB |       4096.5 |    4096 |   9856x |  57.889 us |  30.46% |  50.759 us |  1.94% |  80.696M | 351.188 GB/s | 37.64% |
+|       64 |     128 |        32 |            8 |       128 |       256 |   32.500 MiB |   512.000 KiB |       4096.5 |    8192 |   7136x |  77.139 us |  30.34% |  70.146 us |  1.66% | 116.785M | 493.300 GB/s | 52.87% |
+|       64 |     256 |        32 |            8 |       128 |       256 |   64.500 MiB |   512.000 KiB |       4096.5 |   16384 |   4464x | 121.345 us | 114.43% | 112.028 us |  1.14% | 146.249M | 608.397 GB/s | 65.20% |
+|       64 |     512 |        32 |            8 |       128 |       256 |  128.500 MiB |   512.000 KiB |       4096.5 |   32768 |   2624x | 199.334 us |  26.68% | 190.786 us |  0.74% | 171.753M | 708.995 GB/s | 75.98% |
+|       64 |    1024 |        32 |            8 |       128 |       256 |  256.500 MiB |   512.000 KiB |       4096.5 |   65536 |   1728x | 351.423 us |   9.11% | 344.018 us |  0.63% | 190.501M | 783.342 GB/s | 83.95% |
+|       64 |    2048 |        32 |            8 |       128 |       256 |  512.500 MiB |   512.000 KiB |       4096.5 |  131072 |    773x | 656.623 us |   7.51% | 647.285 us |  0.35% | 202.495M | 831.040 GB/s | 89.06% |
+|       64 |    4096 |        32 |            8 |       128 |       256 |    1.000 GiB |   512.000 KiB |       4096.5 |  262144 |    398x |   1.271 ms |   7.38% |   1.257 ms |  0.33% | 208.487M | 854.798 GB/s | 91.61% |
+|       64 |    8192 |        32 |            8 |       128 |       256 |    2.000 GiB |   512.000 KiB |       4096.5 |  524288 |    202x |   2.522 ms |  20.27% |   2.479 ms |  0.19% | 211.470M | 866.604 GB/s | 92.87% |
+|       64 |   16384 |        32 |            8 |       128 |       256 |    4.000 GiB |   512.000 KiB |       4096.5 | 1048576 |    102x |   4.934 ms |   0.29% |   4.927 ms |  0.17% | 212.844M | 872.021 GB/s | 93.45% |
+S=64 Hqo=32 Hkv=32 D=128 P=256 && ./build/flash_attention_benchmark -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P --disable-blocking-kernel --md "results/benchmark-$S-GQA$(( $Hqo / $Hkv ))-$P-$Hqo-$Hkv-$D.md"
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=32 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.156755ms GPU, 0.164339ms CPU, 0.50s total GPU, 0.70s total wall, 3200x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=64 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.144377ms GPU, 0.152415ms CPU, 0.50s total GPU, 0.69s total wall, 3472x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=128 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.205343ms GPU, 0.213079ms CPU, 0.50s total GPU, 0.64s total wall, 2448x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=256 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.374425ms GPU, 0.384676ms CPU, 0.50s total GPU, 0.57s total wall, 1336x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=512 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.698118ms GPU, 0.710739ms CPU, 0.50s total GPU, 0.54s total wall, 717x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=1024 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 1.305229ms GPU, 1.317261ms CPU, 0.50s total GPU, 0.52s total wall, 384x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=2048 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 2.548715ms GPU, 2.555904ms CPU, 0.50s total GPU, 0.51s total wall, 197x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=4096 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 5.014292ms GPU, 5.037455ms CPU, 0.50s total GPU, 0.51s total wall, 100x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=8192 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 9.913946ms GPU, 10.099128ms CPU, 0.51s total GPU, 0.52s total wall, 51x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=16384 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 19.723461ms GPU, 19.731129ms CPU, 0.51s total GPU, 0.51s total wall, 26x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens  | Samples |  CPU Time  | Noise  |  GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|---------|---------|------------|--------|------------|--------|---------|--------------|--------|
+|       64 |      32 |        32 |           32 |       128 |       256 |   32.500 MiB |   512.000 KiB |        16385 |    2048 |   3200x | 164.339 us | 27.91% | 156.755 us | 19.24% | 13.065M | 220.746 GB/s | 23.66% |
+|       64 |      64 |        32 |           32 |       128 |       256 |   64.500 MiB |   512.000 KiB |        16385 |    4096 |   3472x | 152.415 us | 40.73% | 144.377 us |  0.53% | 28.370M | 472.081 GB/s | 50.59% |
+|       64 |     128 |        32 |           32 |       128 |       256 |  128.500 MiB |   512.000 KiB |        16385 |    8192 |   2448x | 213.079 us | 26.81% | 205.343 us |  0.60% | 39.894M | 658.735 GB/s | 70.59% |
+|       64 |     256 |        32 |           32 |       128 |       256 |  256.500 MiB |   512.000 KiB |        16385 |   16384 |   1336x | 384.676 us | 25.38% | 374.425 us |  0.29% | 43.758M | 719.727 GB/s | 77.13% |
+|       64 |     512 |        32 |           32 |       128 |       256 |  512.500 MiB |   512.000 KiB |        16385 |   32768 |    717x | 710.739 us | 22.65% | 698.118 us |  0.35% | 46.938M | 770.528 GB/s | 82.58% |
+|       64 |    1024 |        32 |           32 |       128 |       256 |    1.000 GiB |   512.000 KiB |        16385 |   65536 |    384x |   1.317 ms |  6.59% |   1.305 ms |  0.20% | 50.210M | 823.449 GB/s | 88.25% |
+|       64 |    2048 |        32 |           32 |       128 |       256 |    2.000 GiB |   512.000 KiB |        16385 |  131072 |    197x |   2.556 ms |  0.35% |   2.549 ms |  0.16% | 51.427M | 842.986 GB/s | 90.34% |
+|       64 |    4096 |        32 |           32 |       128 |       256 |    4.000 GiB |   512.000 KiB |        16385 |  262144 |    100x |   5.037 ms |  3.10% |   5.014 ms |  0.15% | 52.279M | 856.754 GB/s | 91.82% |
+|       64 |    8192 |        32 |           32 |       128 |       256 |    8.000 GiB |   512.000 KiB |        16385 |  524288 |     51x |  10.099 ms | 12.99% |   9.914 ms |  0.14% | 52.884M | 866.555 GB/s | 92.87% |
+|       64 |   16384 |        32 |           32 |       128 |       256 |   16.000 GiB |   512.000 KiB |        16385 | 1048576 |     26x |  19.731 ms |  0.09% |  19.723 ms |  0.07% | 53.164M | 871.090 GB/s | 93.35% |
+S=64 Hqo=32 Hkv=32 D=96  P=256 && ./build/flash_attention_benchmark -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P --disable-blocking-kernel --md "results/benchmark-$S-GQA$(( $Hqo / $Hkv ))-$P-$Hqo-$Hkv-$D.md"
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=32 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 0.124775ms GPU, 0.132695ms CPU, 0.50s total GPU, 0.74s total wall, 4016x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=64 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 0.124723ms GPU, 0.131373ms CPU, 0.54s total GPU, 0.78s total wall, 4368x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=128 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 0.165595ms GPU, 0.172844ms CPU, 0.54s total GPU, 0.71s total wall, 3232x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=256 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 0.285427ms GPU, 0.293950ms CPU, 0.50s total GPU, 0.59s total wall, 1752x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=512 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 0.589486ms GPU, 0.599247ms CPU, 0.50s total GPU, 0.55s total wall, 849x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=1024 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 1.211245ms GPU, 1.230758ms CPU, 0.64s total GPU, 0.67s total wall, 528x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=2048 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 2.438831ms GPU, 2.448932ms CPU, 1.29s total GPU, 1.32s total wall, 528x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=4096 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 4.918704ms GPU, 4.925553ms CPU, 0.50s total GPU, 0.51s total wall, 102x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=8192 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 9.867003ms GPU, 9.943529ms CPU, 0.50s total GPU, 0.51s total wall, 51x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=64 seq_len=16384 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 19.773597ms GPU, 19.781268ms CPU, 0.51s total GPU, 0.52s total wall, 26x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens  | Samples |  CPU Time  | Noise  |  GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|---------|---------|------------|--------|------------|--------|---------|--------------|--------|
+|       64 |      32 |        32 |           32 |        96 |       256 |   24.375 MiB |   384.000 KiB |        12288 |    2048 |   4016x | 132.695 us | 31.01% | 124.775 us | 18.23% | 16.414M | 207.992 GB/s | 22.29% |
+|       64 |      64 |        32 |           32 |        96 |       256 |   48.375 MiB |   384.000 KiB |        12288 |    4096 |   4368x | 131.373 us |  5.37% | 124.723 us |  0.68% | 32.841M | 409.853 GB/s | 43.92% |
+|       64 |     128 |        32 |           32 |        96 |       256 |   96.375 MiB |   384.000 KiB |        12288 |    8192 |   3232x | 172.844 us | 25.04% | 165.595 us | 20.96% | 49.470M | 612.637 GB/s | 65.65% |
+|       64 |     256 |        32 |           32 |        96 |       256 |  192.375 MiB |   384.000 KiB |        12288 |   16384 |   1752x | 293.950 us | 27.16% | 285.427 us |  0.38% | 57.402M | 708.107 GB/s | 75.89% |
+|       64 |     512 |        32 |           32 |        96 |       256 |  384.375 MiB |   384.000 KiB |        12288 |   32768 |    849x | 599.247 us | 14.26% | 589.486 us |  0.31% | 55.587M | 684.392 GB/s | 73.34% |
+|       64 |    1024 |        32 |           32 |        96 |       256 |  768.375 MiB |   384.000 KiB |        12288 |   65536 |    528x |   1.231 ms | 17.57% |   1.211 ms |  0.70% | 54.106M | 665.508 GB/s | 71.32% |
+|       64 |    2048 |        32 |           32 |        96 |       256 |    1.500 GiB |   384.000 KiB |        12288 |  131072 |    528x |   2.449 ms |  2.91% |   2.439 ms |  0.69% | 53.744M | 660.726 GB/s | 70.81% |
+|       64 |    4096 |        32 |           32 |        96 |       256 |    3.000 GiB |   384.000 KiB |        12288 |  262144 |    102x |   4.926 ms |  0.26% |   4.919 ms |  0.21% | 53.295M | 655.053 GB/s | 70.20% |
+|       64 |    8192 |        32 |           32 |        96 |       256 |    6.000 GiB |   384.000 KiB |        12288 |  524288 |     51x |   9.944 ms |  3.62% |   9.867 ms |  0.13% | 53.135M | 653.009 GB/s | 69.98% |
+|       64 |   16384 |        32 |           32 |        96 |       256 |   12.000 GiB |   384.000 KiB |        12288 | 1048576 |     26x |  19.781 ms |  0.07% |  19.774 ms |  0.06% | 53.029M | 651.661 GB/s | 69.84% |
+S=1  Hqo=64 Hkv=8  D=128 P=256 && ./build/flash_attention_benchmark -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P --disable-blocking-kernel --md "results/benchmark-$S-GQA$(( $Hqo / $Hkv ))-$P-$Hqo-$Hkv-$D.md"
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=32 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.027337ms GPU, 0.034304ms CPU, 0.50s total GPU, 1.57s total wall, 18304x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=64 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.027091ms GPU, 0.033814ms CPU, 0.50s total GPU, 1.55s total wall, 18464x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=128 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.027530ms GPU, 0.034333ms CPU, 0.50s total GPU, 1.53s total wall, 18176x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=256 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.030244ms GPU, 0.037187ms CPU, 0.50s total GPU, 1.43s total wall, 16544x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.035750ms GPU, 0.042808ms CPU, 0.50s total GPU, 1.28s total wall, 14000x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.046936ms GPU, 0.053606ms CPU, 0.50s total GPU, 1.06s total wall, 10656x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.069114ms GPU, 0.077387ms CPU, 0.50s total GPU, 0.87s total wall, 7248x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.115760ms GPU, 0.122777ms CPU, 0.50s total GPU, 0.71s total wall, 4320x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.206233ms GPU, 0.213593ms CPU, 0.50s total GPU, 0.62s total wall, 2425x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=16384 num_heads=64 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.381961ms GPU, 0.389602ms CPU, 0.50s total GPU, 0.56s total wall, 1310x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  |  Noise  |  GPU Time  |  Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|---------|------------|---------|---------|--------------|--------|
+|        1 |      32 |        64 |            8 |       128 |       256 |  144.000 KiB |    16.000 KiB |         4096 |     32 |  18304x |  34.304 us |  28.50% |  27.337 us |  11.34% |  1.171M |   5.993 GB/s |  0.64% |
+|        1 |      64 |        64 |            8 |       128 |       256 |  272.000 KiB |    16.000 KiB |         4096 |     64 |  18464x |  33.814 us |  59.84% |  27.091 us |  53.72% |  2.362M |  10.886 GB/s |  1.17% |
+|        1 |     128 |        64 |            8 |       128 |       256 |  528.000 KiB |    16.000 KiB |         4096 |    128 |  18176x |  34.333 us | 231.70% |  27.530 us | 223.72% |  4.650M |  20.235 GB/s |  2.17% |
+|        1 |     256 |        64 |            8 |       128 |       256 |    1.016 MiB |    16.000 KiB |         4096 |    256 |  16544x |  37.187 us |  88.92% |  30.244 us |  63.69% |  8.465M |  35.754 GB/s |  3.83% |
+|        1 |     512 |        64 |            8 |       128 |       256 |    2.016 MiB |    16.000 KiB |         4096 |    512 |  14000x |  42.808 us |  60.74% |  35.750 us |   3.31% | 14.321M |  59.577 GB/s |  6.38% |
+|        1 |    1024 |        64 |            8 |       128 |       256 |    4.016 MiB |    16.000 KiB |         4096 |   1024 |  10656x |  53.606 us |  39.25% |  46.936 us |  36.59% | 21.817M |  90.061 GB/s |  9.65% |
+|        1 |    2048 |        64 |            8 |       128 |       256 |    8.016 MiB |    16.000 KiB |         4096 |   2048 |   7248x |  77.387 us | 155.88% |  69.114 us |   1.28% | 29.632M | 121.848 GB/s | 13.06% |
+|        1 |    4096 |        64 |            8 |       128 |       256 |   16.016 MiB |    16.000 KiB |         4096 |   4096 |   4320x | 122.777 us |  20.93% | 115.760 us |   0.72% | 35.384M | 145.215 GB/s | 15.56% |
+|        1 |    8192 |        64 |            8 |       128 |       256 |   32.016 MiB |    16.000 KiB |         4096 |   8192 |   2425x | 213.593 us |  17.60% | 206.233 us |   0.46% | 39.722M | 162.861 GB/s | 17.45% |
+|        1 |   16384 |        64 |            8 |       128 |       256 |   64.016 MiB |    16.000 KiB |         4096 |  16384 |   1310x | 389.602 us |   9.57% | 381.961 us |   0.25% | 42.894M | 175.781 GB/s | 18.84% |
+S=1  Hqo=32 Hkv=8  D=128 P=256 && ./build/flash_attention_benchmark -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P --disable-blocking-kernel --md "results/benchmark-$S-GQA$(( $Hqo / $Hkv ))-$P-$Hqo-$Hkv-$D.md"
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=32 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.027644ms GPU, 0.034742ms CPU, 0.50s total GPU, 1.56s total wall, 18096x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=64 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.026675ms GPU, 0.033696ms CPU, 0.50s total GPU, 1.56s total wall, 18752x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=128 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.026675ms GPU, 0.033691ms CPU, 0.50s total GPU, 1.57s total wall, 18752x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=256 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.030255ms GPU, 0.037052ms CPU, 0.50s total GPU, 1.43s total wall, 16528x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.035955ms GPU, 0.042779ms CPU, 0.50s total GPU, 1.26s total wall, 13920x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.046954ms GPU, 0.053632ms CPU, 0.50s total GPU, 1.06s total wall, 10656x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.069081ms GPU, 0.077165ms CPU, 0.50s total GPU, 0.87s total wall, 7248x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.116239ms GPU, 0.122894ms CPU, 0.50s total GPU, 0.71s total wall, 4304x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.206359ms GPU, 0.214117ms CPU, 0.50s total GPU, 0.62s total wall, 2423x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=16384 num_heads=32 num_kv_heads=8 head_size=128 page_size=256]
+Pass: Cold: 0.382010ms GPU, 0.390660ms CPU, 0.50s total GPU, 0.56s total wall, 1309x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  |  Noise  |  GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|---------|------------|--------|---------|--------------|--------|
+|        1 |      32 |        32 |            8 |       128 |       256 |  136.000 KiB |     8.000 KiB |         4096 |     32 |  18096x |  34.742 us |  51.81% |  27.644 us | 43.26% |  1.158M |   5.334 GB/s |  0.57% |
+|        1 |      64 |        32 |            8 |       128 |       256 |  264.000 KiB |     8.000 KiB |         4096 |     64 |  18752x |  33.696 us | 111.74% |  26.675 us | 81.02% |  2.399M |  10.441 GB/s |  1.12% |
+|        1 |     128 |        32 |            8 |       128 |       256 |  520.000 KiB |     8.000 KiB |         4096 |    128 |  18752x |  33.691 us |  70.47% |  26.675 us |  3.15% |  4.799M |  20.269 GB/s |  2.17% |
+|        1 |     256 |        32 |            8 |       128 |       256 |    1.008 MiB |     8.000 KiB |         4096 |    256 |  16528x |  37.052 us |  48.79% |  30.255 us | 42.02% |  8.461M |  35.199 GB/s |  3.77% |
+|        1 |     512 |        32 |            8 |       128 |       256 |    2.008 MiB |     8.000 KiB |         4096 |    512 |  13920x |  42.779 us |  63.01% |  35.955 us | 45.46% | 14.240M |  58.783 GB/s |  6.30% |
+|        1 |    1024 |        32 |            8 |       128 |       256 |    4.008 MiB |     8.000 KiB |         4096 |   1024 |  10656x |  53.632 us |  45.43% |  46.954 us | 43.12% | 21.808M |  89.676 GB/s |  9.61% |
+|        1 |    2048 |        32 |            8 |       128 |       256 |    8.008 MiB |     8.000 KiB |         4096 |   2048 |   7248x |  77.165 us | 145.60% |  69.081 us |  3.81% | 29.646M | 121.668 GB/s | 13.04% |
+|        1 |    4096 |        32 |            8 |       128 |       256 |   16.008 MiB |     8.000 KiB |         4096 |   4096 |   4304x | 122.894 us |   5.77% | 116.239 us |  0.76% | 35.238M | 144.475 GB/s | 15.48% |
+|        1 |    8192 |        32 |            8 |       128 |       256 |   32.008 MiB |     8.000 KiB |         4096 |   8192 |   2423x | 214.117 us |  19.17% | 206.359 us |  0.49% | 39.698M | 162.682 GB/s | 17.43% |
+|        1 |   16384 |        32 |            8 |       128 |       256 |   64.008 MiB |     8.000 KiB |         4096 |  16384 |   1309x | 390.660 us |  11.05% | 382.010 us |  0.28% | 42.889M | 175.716 GB/s | 18.83% |
+S=1  Hqo=32 Hkv=32 D=128 P=256 && ./build/flash_attention_benchmark -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P --disable-blocking-kernel --md "results/benchmark-$S-GQA$(( $Hqo / $Hkv ))-$P-$Hqo-$Hkv-$D.md"
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=32 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.024190ms GPU, 0.031145ms CPU, 0.50s total GPU, 1.86s total wall, 20672x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=64 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.024176ms GPU, 0.030985ms CPU, 0.50s total GPU, 1.81s total wall, 20688x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=128 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.025712ms GPU, 0.032582ms CPU, 0.50s total GPU, 1.74s total wall, 19456x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=256 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.029587ms GPU, 0.036520ms CPU, 0.50s total GPU, 1.53s total wall, 16912x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.037800ms GPU, 0.044619ms CPU, 0.50s total GPU, 1.29s total wall, 13232x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.055335ms GPU, 0.062162ms CPU, 0.50s total GPU, 1.01s total wall, 9040x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.083104ms GPU, 0.090154ms CPU, 0.50s total GPU, 0.84s total wall, 6032x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.128397ms GPU, 0.135524ms CPU, 0.50s total GPU, 0.71s total wall, 3904x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.218876ms GPU, 0.229161ms CPU, 0.50s total GPU, 0.63s total wall, 2288x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=16384 num_heads=32 num_kv_heads=32 head_size=128 page_size=256]
+Pass: Cold: 0.400817ms GPU, 0.408909ms CPU, 0.50s total GPU, 0.57s total wall, 1248x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  | Noise  |  GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|--------|------------|--------|---------|--------------|--------|
+|        1 |      32 |        32 |           32 |       128 |       256 |  520.000 KiB |     8.000 KiB |        16384 |     32 |  20672x |  31.145 us | 33.22% |  24.190 us |  9.06% |  1.323M |  22.351 GB/s |  2.40% |
+|        1 |      64 |        32 |           32 |       128 |       256 |    1.008 MiB |     8.000 KiB |        16384 |     64 |  20688x |  30.985 us | 65.88% |  24.176 us | 59.54% |  2.647M |  44.050 GB/s |  4.72% |
+|        1 |     128 |        32 |           32 |       128 |       256 |    2.008 MiB |     8.000 KiB |        16384 |    128 |  19456x |  32.582 us | 28.52% |  25.712 us |  3.21% |  4.978M |  82.201 GB/s |  8.81% |
+|        1 |     256 |        32 |           32 |       128 |       256 |    4.008 MiB |     8.000 KiB |        16384 |    256 |  16912x |  36.520 us | 51.57% |  29.587 us |  2.48% |  8.653M | 142.318 GB/s | 15.25% |
+|        1 |     512 |        32 |           32 |       128 |       256 |    8.008 MiB |     8.000 KiB |        16384 |    512 |  13232x |  44.619 us | 18.20% |  37.800 us |  2.59% | 13.545M | 222.351 GB/s | 23.83% |
+|        1 |    1024 |        32 |           32 |       128 |       256 |   16.008 MiB |     8.000 KiB |        16384 |   1024 |   9040x |  62.162 us | 36.84% |  55.335 us | 34.61% | 18.505M | 303.487 GB/s | 32.52% |
+|        1 |    2048 |        32 |           32 |       128 |       256 |   32.008 MiB |     8.000 KiB |        16384 |   2048 |   6032x |  90.154 us | 10.53% |  83.104 us |  1.27% | 24.644M | 403.964 GB/s | 43.29% |
+|        1 |    4096 |        32 |           32 |       128 |       256 |   64.008 MiB |     8.000 KiB |        16384 |   4096 |   3904x | 135.524 us | 20.45% | 128.397 us |  0.86% | 31.901M | 522.796 GB/s | 56.03% |
+|        1 |    8192 |        32 |           32 |       128 |       256 |  128.008 MiB |     8.000 KiB |        16384 |   8192 |   2288x | 229.161 us | 77.30% | 218.876 us |  0.72% | 37.428M | 613.287 GB/s | 65.72% |
+|        1 |   16384 |        32 |           32 |       128 |       256 |  256.008 MiB |     8.000 KiB |        16384 |  16384 |   1248x | 408.909 us | 12.00% | 400.817 us |  0.48% | 40.876M | 669.761 GB/s | 71.78% |
+S=1  Hqo=32 Hkv=32 D=96  P=256 && ./build/flash_attention_benchmark -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P --disable-blocking-kernel --md "results/benchmark-$S-GQA$(( $Hqo / $Hkv ))-$P-$Hqo-$Hkv-$D.md"
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23805 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=32 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 0.024205ms GPU, 0.031398ms CPU, 0.50s total GPU, 1.87s total wall, 20672x 
+Run:  [2/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=64 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 0.024325ms GPU, 0.031237ms CPU, 0.50s total GPU, 1.80s total wall, 20560x 
+Run:  [3/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=128 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 0.025778ms GPU, 0.032693ms CPU, 0.50s total GPU, 1.74s total wall, 19408x 
+Run:  [4/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=256 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 0.029697ms GPU, 0.036494ms CPU, 0.50s total GPU, 1.54s total wall, 16848x 
+Run:  [5/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 0.036573ms GPU, 0.043483ms CPU, 0.50s total GPU, 1.33s total wall, 13680x 
+Run:  [6/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 0.052576ms GPU, 0.059341ms CPU, 0.50s total GPU, 1.05s total wall, 9520x 
+Run:  [7/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 0.080568ms GPU, 0.088609ms CPU, 0.50s total GPU, 0.86s total wall, 6208x 
+Run:  [8/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 0.123140ms GPU, 0.130293ms CPU, 0.50s total GPU, 0.72s total wall, 4064x 
+Run:  [9/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 0.209453ms GPU, 0.216910ms CPU, 0.50s total GPU, 0.63s total wall, 2400x 
+Run:  [10/10] run_mha_varlen_fwd [Device=0 num_seqs=1 seq_len=16384 num_heads=32 num_kv_heads=32 head_size=96 page_size=256]
+Pass: Cold: 0.380303ms GPU, 0.388319ms CPU, 0.51s total GPU, 0.58s total wall, 1328x 
+```
+
+# Benchmark Results
+
+## run_mha_varlen_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | page_size | Memory Reads | Memory Writes | Memory Usage | Tokens | Samples |  CPU Time  |  Noise  |  GPU Time  | Noise  | Elem/s  | GlobalMem BW | BWUtil |
+|----------|---------|-----------|--------------|-----------|-----------|--------------|---------------|--------------|--------|---------|------------|---------|------------|--------|---------|--------------|--------|
+|        1 |      32 |        32 |           32 |        96 |       256 |  390.000 KiB |     6.000 KiB |        12288 |     32 |  20672x |  31.398 us | 118.39% |  24.205 us |  9.09% |  1.322M |  16.753 GB/s |  1.80% |
+|        1 |      64 |        32 |           32 |        96 |       256 |  774.000 KiB |     6.000 KiB |        12288 |     64 |  20560x |  31.237 us |  96.11% |  24.325 us | 75.38% |  2.631M |  32.835 GB/s |  3.52% |
+|        1 |     128 |        32 |           32 |        96 |       256 |    1.506 MiB |     6.000 KiB |        12288 |    128 |  19408x |  32.693 us |  81.97% |  25.778 us |  3.21% |  4.965M |  61.491 GB/s |  6.59% |
+|        1 |     256 |        32 |           32 |        96 |       256 |    3.006 MiB |     6.000 KiB |        12288 |    256 |  16848x |  36.494 us |  49.83% |  29.697 us |  7.38% |  8.620M | 106.340 GB/s | 11.40% |
+|        1 |     512 |        32 |           32 |        96 |       256 |    6.006 MiB |     6.000 KiB |        12288 |    512 |  13680x |  43.483 us |  44.70% |  36.573 us | 28.28% | 13.999M | 172.360 GB/s | 18.47% |
+|        1 |    1024 |        32 |           32 |        96 |       256 |   12.006 MiB |     6.000 KiB |        12288 |   1024 |   9520x |  59.341 us |  24.70% |  52.576 us |  2.27% | 19.477M | 239.563 GB/s | 25.67% |
+|        1 |    2048 |        32 |           32 |        96 |       256 |   24.006 MiB |     6.000 KiB |        12288 |   2048 |   6208x |  88.609 us | 137.55% |  80.568 us |  1.85% | 25.419M | 312.506 GB/s | 33.49% |
+|        1 |    4096 |        32 |           32 |        96 |       256 |   48.006 MiB |     6.000 KiB |        12288 |   4096 |   4064x | 130.293 us |  21.35% | 123.140 us |  1.35% | 33.263M | 408.834 GB/s | 43.81% |
+|        1 |    8192 |        32 |           32 |        96 |       256 |   96.006 MiB |     6.000 KiB |        12288 |   8192 |   2400x | 216.910 us |  16.29% | 209.453 us |  0.88% | 39.111M | 480.659 GB/s | 51.51% |
+|        1 |   16384 |        32 |           32 |        96 |       256 |  192.006 MiB |     6.000 KiB |        12288 |  16384 |   1328x | 388.319 us |  11.68% | 380.303 us |  0.54% | 43.081M | 529.418 GB/s | 56.74% |
