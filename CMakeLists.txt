@@ -62,19 +62,46 @@ add_library(flash_attn SHARED IMPORTED)
 set_property(TARGET flash_attn PROPERTY IMPORTED_LOCATION ${PROJECT_SOURCE_DIR}/lib/${flash_attn_lib_filename})
 
 
-add_executable(flash_attention_benchmark flash_attention_benchmark.cu)
-target_link_directories(flash_attention_benchmark PRIVATE ${PROJECT_SOURCE_DIR})
-target_link_libraries(flash_attention_benchmark
+# Add the three separate benchmarks
+add_executable(flash_attention_benchmark_standard flash_attention_benchmark_standard.cu)
+target_link_directories(flash_attention_benchmark_standard PRIVATE ${PROJECT_SOURCE_DIR})
+target_link_libraries(flash_attention_benchmark_standard
   PRIVATE
   nvbench::main
-    # ":${flash_attn_lib_filename}"
-    flash_attn
-    torch
-    ${TORCH_LIBRARIES}
-    ${TORCH_PYTHON_LIBRARY}
-    Python3::Python
+  flash_attn
+  torch
+  ${TORCH_LIBRARIES}
+  ${TORCH_PYTHON_LIBRARY}
+  Python3::Python
 )
-target_include_directories(flash_attention_benchmark PRIVATE
-  ${TORCH_INCLUDE_DIRS}
+target_include_directories(flash_attention_benchmark_standard PRIVATE ${TORCH_INCLUDE_DIRS})
+nvbench_config_target(flash_attention_benchmark_standard)
+
+add_executable(flash_attention_benchmark_varlen flash_attention_benchmark_varlen.cu)
+target_link_directories(flash_attention_benchmark_varlen PRIVATE ${PROJECT_SOURCE_DIR})
+target_link_libraries(flash_attention_benchmark_varlen
+  PRIVATE
+  nvbench::main
+  flash_attn
+  torch
+  ${TORCH_LIBRARIES}
+  ${TORCH_PYTHON_LIBRARY}
+  Python3::Python
 )
-nvbench_config_target(flash_attention_benchmark)
+target_include_directories(flash_attention_benchmark_varlen PRIVATE ${TORCH_INCLUDE_DIRS})
+nvbench_config_target(flash_attention_benchmark_varlen)
+
+add_executable(flash_attention_benchmark_kvcache flash_attention_benchmark_kvcache.cu)
+target_link_directories(flash_attention_benchmark_kvcache PRIVATE ${PROJECT_SOURCE_DIR})
+target_link_libraries(flash_attention_benchmark_kvcache
+  PRIVATE
+  nvbench::main
+  flash_attn
+  torch
+  ${TORCH_LIBRARIES}
+  ${TORCH_PYTHON_LIBRARY}
+  Python3::Python
+)
+target_include_directories(flash_attention_benchmark_kvcache PRIVATE ${TORCH_INCLUDE_DIRS})
+nvbench_config_target(flash_attention_benchmark_kvcache)
+
