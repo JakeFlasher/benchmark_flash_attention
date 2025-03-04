@@ -17,63 +17,63 @@
 
 ```
 Run:  [1/18] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 window_left=-1 window_right=-1 causal=0]
-Pass: Cold: 1316.810292ms GPU, 1316.832414ms CPU, 14.48s total GPU, 14.49s total wall, 11x 
-Pass: Batch: 1319.062286ms GPU, 15.83s total GPU, 15.83s total wall, 12x
+Pass: Cold: 1315.256059ms GPU, 1315.278620ms CPU, 14.47s total GPU, 14.47s total wall, 11x 
+Pass: Batch: 1316.291524ms GPU, 15.80s total GPU, 15.80s total wall, 12x
 Run:  [2/18] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=-1 causal=0]
-Pass: Cold: 826.140398ms GPU, 826.155550ms CPU, 9.09s total GPU, 9.09s total wall, 11x 
-Pass: Batch: 826.286926ms GPU, 9.92s total GPU, 9.92s total wall, 12x
+Pass: Cold: 826.594954ms GPU, 826.609050ms CPU, 9.09s total GPU, 9.09s total wall, 11x 
+Pass: Batch: 827.650223ms GPU, 9.93s total GPU, 9.93s total wall, 12x
 Run:  [3/18] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=-1 causal=0]
-Pass: Cold: 869.746216ms GPU, 869.761269ms CPU, 9.57s total GPU, 9.57s total wall, 11x 
-Pass: Batch: 869.441101ms GPU, 10.43s total GPU, 10.43s total wall, 12x
+Pass: Cold: 871.494573ms GPU, 871.508849ms CPU, 9.59s total GPU, 9.59s total wall, 11x 
+Pass: Batch: 872.331945ms GPU, 10.47s total GPU, 10.47s total wall, 12x
 Run:  [4/18] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 window_left=-1 window_right=128 causal=0]
-Pass: Cold: 862.353222ms GPU, 862.370129ms CPU, 9.49s total GPU, 9.49s total wall, 11x 
-Pass: Batch: 862.286840ms GPU, 10.35s total GPU, 10.35s total wall, 12x
+Pass: Cold: 863.815690ms GPU, 863.830365ms CPU, 9.50s total GPU, 9.50s total wall, 11x 
+Pass: Batch: 863.881561ms GPU, 10.37s total GPU, 10.37s total wall, 12x
 Run:  [5/18] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=0]
-Pass: Cold: 24.757033ms GPU, 24.764980ms CPU, 14.26s total GPU, 14.29s total wall, 576x 
-Pass: Batch: 24.762707ms GPU, 14.29s total GPU, 14.29s total wall, 577x
+Pass: Cold: 24.841070ms GPU, 24.848594ms CPU, 0.52s total GPU, 0.52s total wall, 21x 
+Pass: Batch: 24.858856ms GPU, 0.55s total GPU, 0.55s total wall, 22x
 Run:  [6/18] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=128 causal=0]
-Pass: Cold: 68.898817ms GPU, 68.906989ms CPU, 0.76s total GPU, 0.76s total wall, 11x 
-Pass: Batch: 68.900950ms GPU, 0.83s total GPU, 0.83s total wall, 12x
+Pass: Cold: 69.115546ms GPU, 69.123575ms CPU, 5.53s total GPU, 5.53s total wall, 80x 
+Pass: Batch: 69.103831ms GPU, 5.60s total GPU, 5.60s total wall, 81x
 Run:  [7/18] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 window_left=-1 window_right=1024 causal=0]
-Pass: Cold: 908.051641ms GPU, 908.068271ms CPU, 9.99s total GPU, 9.99s total wall, 11x 
-Pass: Batch: 908.130722ms GPU, 10.90s total GPU, 10.90s total wall, 12x
+Pass: Cold: 910.442499ms GPU, 910.456187ms CPU, 10.01s total GPU, 10.02s total wall, 11x 
+Pass: Batch: 910.405802ms GPU, 10.92s total GPU, 10.93s total wall, 12x
 Run:  [8/18] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=1024 causal=0]
-Pass: Cold: 68.815085ms GPU, 68.823600ms CPU, 0.89s total GPU, 0.90s total wall, 13x 
-Pass: Batch: 68.876142ms GPU, 0.96s total GPU, 0.96s total wall, 14x
+Pass: Cold: 69.020300ms GPU, 69.028628ms CPU, 0.76s total GPU, 0.76s total wall, 11x 
+Pass: Batch: 69.156950ms GPU, 0.83s total GPU, 0.83s total wall, 12x
 Run:  [9/18] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=0]
-Pass: Cold: 112.864256ms GPU, 112.873302ms CPU, 1.35s total GPU, 1.36s total wall, 12x 
-Pass: Batch: 112.964844ms GPU, 1.47s total GPU, 1.47s total wall, 13x
+Pass: Cold: 113.503682ms GPU, 113.512219ms CPU, 4.65s total GPU, 4.66s total wall, 41x 
+Pass: Batch: 113.539925ms GPU, 4.77s total GPU, 4.77s total wall, 42x
 Run:  [10/18] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 window_left=-1 window_right=-1 causal=1]
-Pass: Cold: 686.782010ms GPU, 686.795881ms CPU, 7.55s total GPU, 7.56s total wall, 11x 
-Pass: Batch: 686.348038ms GPU, 8.24s total GPU, 8.24s total wall, 12x
+Pass: Cold: 690.069319ms GPU, 690.082003ms CPU, 7.59s total GPU, 7.59s total wall, 11x 
+Pass: Batch: 690.030009ms GPU, 8.28s total GPU, 8.28s total wall, 12x
 Run:  [11/18] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=-1 causal=1]
-Pass: Cold: 18.026213ms GPU, 18.033975ms CPU, 11.54s total GPU, 11.57s total wall, 640x 
-Pass: Batch: 18.025036ms GPU, 11.55s total GPU, 11.56s total wall, 641x
+Pass: Cold: 18.097341ms GPU, 18.105186ms CPU, 13.03s total GPU, 13.07s total wall, 720x 
+Pass: Batch: 18.087122ms GPU, 13.04s total GPU, 13.05s total wall, 721x
 Run:  [12/18] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=-1 causal=1]
-Warn: Current measurement timed out (15.06s) while over noise threshold (0.61% > 0.50%)
-Pass: Cold: 62.424081ms GPU, 62.432815ms CPU, 15.04s total GPU, 15.06s total wall, 241x 
-Pass: Batch: 62.449294ms GPU, 15.05s total GPU, 15.05s total wall, 241x
+Warn: Current measurement timed out (15.04s) while over noise threshold (0.60% > 0.50%)
+Pass: Cold: 62.629466ms GPU, 62.637439ms CPU, 15.03s total GPU, 15.04s total wall, 240x 
+Pass: Batch: 62.682799ms GPU, 15.04s total GPU, 15.05s total wall, 240x
 Run:  [13/18] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 window_left=-1 window_right=128 causal=1]
-Pass: Cold: 686.897888ms GPU, 686.911270ms CPU, 7.56s total GPU, 7.56s total wall, 11x 
-Pass: Batch: 686.425858ms GPU, 8.24s total GPU, 8.24s total wall, 12x
+Pass: Cold: 690.026312ms GPU, 690.039084ms CPU, 7.59s total GPU, 7.59s total wall, 11x 
+Pass: Batch: 690.389847ms GPU, 8.28s total GPU, 8.28s total wall, 12x
 Run:  [14/18] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=1]
-Pass: Cold: 18.022902ms GPU, 18.031214ms CPU, 13.26s total GPU, 13.30s total wall, 736x 
-Pass: Batch: 18.018436ms GPU, 13.28s total GPU, 13.29s total wall, 737x
+Warn: Current measurement timed out (15.00s) while over noise threshold (0.56% > 0.50%)
+Pass: Cold: 18.129611ms GPU, 18.138814ms CPU, 14.96s total GPU, 15.00s total wall, 825x 
+Pass: Batch: 18.116001ms GPU, 14.96s total GPU, 14.97s total wall, 826x
 Run:  [15/18] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=128 causal=1]
-Warn: Current measurement timed out (15.05s) while over noise threshold (0.55% > 0.50%)
-Pass: Cold: 62.407174ms GPU, 62.415502ms CPU, 15.04s total GPU, 15.05s total wall, 241x 
-Pass: Batch: 62.472859ms GPU, 15.06s total GPU, 15.06s total wall, 241x
+Warn: Current measurement timed out (15.05s) while over noise threshold (0.56% > 0.50%)
+Pass: Cold: 62.635610ms GPU, 62.643789ms CPU, 15.03s total GPU, 15.05s total wall, 240x 
+Pass: Batch: 62.683217ms GPU, 15.04s total GPU, 15.05s total wall, 240x
 Run:  [16/18] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 window_left=-1 window_right=1024 causal=1]
-Pass: Cold: 686.577293ms GPU, 686.591407ms CPU, 7.55s total GPU, 7.55s total wall, 11x 
-Pass: Batch: 686.698919ms GPU, 8.24s total GPU, 8.24s total wall, 12x
+Pass: Cold: 690.166132ms GPU, 690.179211ms CPU, 7.59s total GPU, 7.59s total wall, 11x 
+Pass: Batch: 690.345144ms GPU, 8.28s total GPU, 8.28s total wall, 12x
 Run:  [17/18] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=1024 causal=1]
-Warn: Current measurement timed out (15.02s) while over noise threshold (0.73% > 0.50%)
-Pass: Cold: 18.037062ms GPU, 18.044917ms CPU, 14.97s total GPU, 15.02s total wall, 830x 
-Pass: Batch: 18.022655ms GPU, 14.98s total GPU, 14.99s total wall, 831x
+Pass: Cold: 18.134912ms GPU, 18.142709ms CPU, 13.93s total GPU, 13.97s total wall, 768x 
+Pass: Batch: 18.118099ms GPU, 13.93s total GPU, 13.94s total wall, 769x
 Run:  [18/18] run_mha_varlen_fwd [Device=0 num_seqs=8 seq_len=32768 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=1]
-Warn: Current measurement timed out (15.05s) while over noise threshold (0.58% > 0.50%)
-Pass: Cold: 62.409188ms GPU, 62.417359ms CPU, 15.04s total GPU, 15.05s total wall, 241x 
-Pass: Batch: 62.446142ms GPU, 15.05s total GPU, 15.05s total wall, 241x
+Warn: Current measurement timed out (15.04s) while over noise threshold (0.58% > 0.50%)
+Pass: Cold: 62.632986ms GPU, 62.640987ms CPU, 15.03s total GPU, 15.04s total wall, 240x 
+Pass: Batch: 62.683255ms GPU, 15.04s total GPU, 15.05s total wall, 240x
 ```
 
 # Benchmark Results
@@ -84,21 +84,21 @@ Pass: Batch: 62.446142ms GPU, 15.05s total GPU, 15.05s total wall, 241x
 
 | num_seqs | seq_len | num_heads | num_kv_heads | head_size | window_left | window_right | causal | Q Tensor  |  K Tensor   |  V Tensor   |  Output   | Tokens |   Est. FLOPS   | Memory Usage | Samples |  CPU Time  | Noise |  GPU Time  | Noise |  Elem/s  | GlobalMem BW | BWUtil | Samples | Batch GPU  |
 |----------|---------|-----------|--------------|-----------|-------------|--------------|--------|-----------|-------------|-------------|-----------|--------|----------------|--------------|---------|------------|-------|------------|-------|----------|--------------|--------|---------|------------|
-|        8 |   32768 |        32 |            8 |       128 |          -1 |           -1 |      0 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     11x |    1.317 s | 0.18% |    1.317 s | 0.18% | 199.075K |   4.077 GB/s |  0.44% |     12x |    1.319 s |
-|        8 |   32768 |        32 |            8 |       128 |         128 |           -1 |      0 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     11x | 826.156 ms | 0.11% | 826.140 ms | 0.11% | 317.312K |   6.499 GB/s |  0.70% |     12x | 826.287 ms |
-|        8 |   32768 |        32 |            8 |       128 |        1024 |           -1 |      0 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     11x | 869.761 ms | 0.11% | 869.746 ms | 0.11% | 301.403K |   6.173 GB/s |  0.66% |     12x | 869.441 ms |
-|        8 |   32768 |        32 |            8 |       128 |          -1 |          128 |      0 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     11x | 862.370 ms | 0.06% | 862.353 ms | 0.06% | 303.987K |   6.226 GB/s |  0.67% |     12x | 862.287 ms |
-|        8 |   32768 |        32 |            8 |       128 |         128 |          128 |      0 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |    576x |  24.765 ms | 0.65% |  24.757 ms | 0.65% |  10.589M | 216.856 GB/s | 23.24% |    577x |  24.763 ms |
-|        8 |   32768 |        32 |            8 |       128 |        1024 |          128 |      0 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     11x |  68.907 ms | 0.37% |  68.899 ms | 0.37% |   3.805M |  77.922 GB/s |  8.35% |     12x |  68.901 ms |
-|        8 |   32768 |        32 |            8 |       128 |          -1 |         1024 |      0 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     11x | 908.068 ms | 0.05% | 908.052 ms | 0.05% | 288.688K |   5.912 GB/s |  0.63% |     12x | 908.131 ms |
-|        8 |   32768 |        32 |            8 |       128 |         128 |         1024 |      0 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     13x |  68.824 ms | 0.48% |  68.815 ms | 0.49% |   3.809M |  78.016 GB/s |  8.36% |     14x |  68.876 ms |
-|        8 |   32768 |        32 |            8 |       128 |        1024 |         1024 |      0 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     12x | 112.873 ms | 0.50% | 112.864 ms | 0.50% |   2.323M |  47.568 GB/s |  5.10% |     13x | 112.965 ms |
-|        8 |   32768 |        32 |            8 |       128 |          -1 |           -1 |      1 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     11x | 686.796 ms | 0.13% | 686.782 ms | 0.13% | 381.699K |   7.817 GB/s |  0.84% |     12x | 686.348 ms |
-|        8 |   32768 |        32 |            8 |       128 |         128 |           -1 |      1 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |    640x |  18.034 ms | 0.66% |  18.026 ms | 0.66% |  14.542M | 297.828 GB/s | 31.92% |    641x |  18.025 ms |
-|        8 |   32768 |        32 |            8 |       128 |        1024 |           -1 |      1 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |    241x |  62.433 ms | 0.61% |  62.424 ms | 0.61% |   4.199M |  86.004 GB/s |  9.22% |    241x |  62.449 ms |
-|        8 |   32768 |        32 |            8 |       128 |          -1 |          128 |      1 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     11x | 686.911 ms | 0.21% | 686.898 ms | 0.21% | 381.635K |   7.816 GB/s |  0.84% |     12x | 686.426 ms |
-|        8 |   32768 |        32 |            8 |       128 |         128 |          128 |      1 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |    736x |  18.031 ms | 0.62% |  18.023 ms | 0.62% |  14.545M | 297.883 GB/s | 31.92% |    737x |  18.018 ms |
-|        8 |   32768 |        32 |            8 |       128 |        1024 |          128 |      1 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |    241x |  62.416 ms | 0.55% |  62.407 ms | 0.55% |   4.201M |  86.027 GB/s |  9.22% |    241x |  62.473 ms |
-|        8 |   32768 |        32 |            8 |       128 |          -1 |         1024 |      1 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     11x | 686.591 ms | 0.15% | 686.577 ms | 0.15% | 381.813K |   7.820 GB/s |  0.84% |     12x | 686.699 ms |
-|        8 |   32768 |        32 |            8 |       128 |         128 |         1024 |      1 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |    830x |  18.045 ms | 0.73% |  18.037 ms | 0.73% |  14.534M | 297.649 GB/s | 31.90% |    831x |  18.023 ms |
-|        8 |   32768 |        32 |            8 |       128 |        1024 |         1024 |      1 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |    241x |  62.417 ms | 0.58% |  62.409 ms | 0.58% |   4.200M |  86.024 GB/s |  9.22% |    241x |  62.446 ms |
+|        8 |   32768 |        32 |            8 |       128 |          -1 |           -1 |      0 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     11x |    1.315 s | 0.10% |    1.315 s | 0.10% | 199.310K |   4.082 GB/s |  0.44% |     12x |    1.316 s |
+|        8 |   32768 |        32 |            8 |       128 |         128 |           -1 |      0 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     11x | 826.609 ms | 0.11% | 826.595 ms | 0.11% | 317.137K |   6.495 GB/s |  0.70% |     12x | 827.650 ms |
+|        8 |   32768 |        32 |            8 |       128 |        1024 |           -1 |      0 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     11x | 871.509 ms | 0.07% | 871.495 ms | 0.07% | 300.798K |   6.160 GB/s |  0.66% |     12x | 872.332 ms |
+|        8 |   32768 |        32 |            8 |       128 |          -1 |          128 |      0 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     11x | 863.830 ms | 0.07% | 863.816 ms | 0.07% | 303.472K |   6.215 GB/s |  0.67% |     12x | 863.882 ms |
+|        8 |   32768 |        32 |            8 |       128 |         128 |          128 |      0 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     21x |  24.849 ms | 0.35% |  24.841 ms | 0.35% |  10.553M | 216.122 GB/s | 23.16% |     22x |  24.859 ms |
+|        8 |   32768 |        32 |            8 |       128 |        1024 |          128 |      0 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     80x |  69.124 ms | 0.58% |  69.116 ms | 0.58% |   3.793M |  77.677 GB/s |  8.32% |     81x |  69.104 ms |
+|        8 |   32768 |        32 |            8 |       128 |          -1 |         1024 |      0 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     11x | 910.456 ms | 0.08% | 910.442 ms | 0.08% | 287.930K |   5.897 GB/s |  0.63% |     12x | 910.406 ms |
+|        8 |   32768 |        32 |            8 |       128 |         128 |         1024 |      0 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     11x |  69.029 ms | 0.43% |  69.020 ms | 0.43% |   3.798M |  77.784 GB/s |  8.34% |     12x |  69.157 ms |
+|        8 |   32768 |        32 |            8 |       128 |        1024 |         1024 |      0 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     41x | 113.512 ms | 0.50% | 113.504 ms | 0.50% |   2.310M |  47.300 GB/s |  5.07% |     42x | 113.540 ms |
+|        8 |   32768 |        32 |            8 |       128 |          -1 |           -1 |      1 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     11x | 690.082 ms | 0.11% | 690.069 ms | 0.11% | 379.881K |   7.780 GB/s |  0.83% |     12x | 690.030 ms |
+|        8 |   32768 |        32 |            8 |       128 |         128 |           -1 |      1 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |    720x |  18.105 ms | 0.69% |  18.097 ms | 0.69% |  14.485M | 296.657 GB/s | 31.79% |    721x |  18.087 ms |
+|        8 |   32768 |        32 |            8 |       128 |        1024 |           -1 |      1 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |    240x |  62.637 ms | 0.60% |  62.629 ms | 0.60% |   4.186M |  85.722 GB/s |  9.19% |    240x |  62.683 ms |
+|        8 |   32768 |        32 |            8 |       128 |          -1 |          128 |      1 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     11x | 690.039 ms | 0.22% | 690.026 ms | 0.22% | 379.904K |   7.780 GB/s |  0.83% |     12x | 690.390 ms |
+|        8 |   32768 |        32 |            8 |       128 |         128 |          128 |      1 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |    825x |  18.139 ms | 0.61% |  18.130 ms | 0.56% |  14.459M | 296.129 GB/s | 31.74% |    826x |  18.116 ms |
+|        8 |   32768 |        32 |            8 |       128 |        1024 |          128 |      1 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |    240x |  62.644 ms | 0.56% |  62.636 ms | 0.56% |   4.185M |  85.713 GB/s |  9.19% |    240x |  62.683 ms |
+|        8 |   32768 |        32 |            8 |       128 |          -1 |         1024 |      1 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |     11x | 690.179 ms | 0.16% | 690.166 ms | 0.16% | 379.827K |   7.779 GB/s |  0.83% |     12x | 690.345 ms |
+|        8 |   32768 |        32 |            8 |       128 |         128 |         1024 |      1 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |    768x |  18.143 ms | 0.62% |  18.135 ms | 0.62% |  14.455M | 296.043 GB/s | 31.73% |    769x |  18.118 ms |
+|        8 |   32768 |        32 |            8 |       128 |        1024 |         1024 |      1 | 2.000 GiB | 512.000 MiB | 512.000 MiB | 2.000 GiB | 262144 | 70368744177664 |         5120 |    240x |  62.641 ms | 0.58% |  62.633 ms | 0.58% |   4.185M |  85.717 GB/s |  9.19% |    240x |  62.683 ms |
