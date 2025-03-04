@@ -5,7 +5,7 @@ START_TIME=$(date +%s)
 
 set -ev
 
-export CUDA_VISIBLE_DEVICES=7
+export CUDA_VISIBLE_DEVICES=5
 export LD_LIBRARY_PATH=$(dirname $(python -c 'import torch; print(torch.__file__)'))/lib/
 
 mkdir -p ./results_standard
@@ -19,7 +19,38 @@ echo "===== STANDARD ATTENTION BENCHMARKS ====="
 
 # Modern LLM model configurations
 echo "Testing modern LLM configurations..."
+# Window attention tests
+echo "Testing sliding window attention..."
+S=1 Hqo=32 Hkv=8 D=128 && for W in 128 512 1024; do
+  ./build/flash_attention_benchmark_standard \
+    -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D \
+    -a window_left=$W -a window_right=$W \
+    --disable-blocking-kernel --md "results_standard/window-$W.md"
+done
+# Test DeepSeek-R1 model with sliding window to simulate typical use
+S=1 Hqo=128 Hkv=128 D=56 && ./build/flash_attention_benchmark_standard \
+  -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D \
+  -a window_left=4096 -a window_right=4096 \
+  --disable-blocking-kernel --md "results_standard/deepseek-r1-window.md"
 
+# Test extreme case: large batch + long context + window attention
+S=32 Hqo=32 Hkv=8 D=128 && ./build/flash_attention_benchmark_standard \
+  -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D \
+  -a seq_len=4096 -a window_left=1024 -a window_right=1024 \
+  --disable-blocking-kernel --md "results_standard/extreme-case.md"
+# Asymmetric window tests
+S=1 Hqo=32 Hkv=8 D=128 && \
+  ./build/flash_attention_benchmark_standard \
+  -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D \
+  -a window_left=1024 -a window_right=128 \
+  --disable-blocking-kernel --md "results_standard/window-asymmetric.md"
+
+# Test non-causal attention
+echo "Testing non-causal attention..."
+S=1 Hqo=32 Hkv=8 D=128 && ./build/flash_attention_benchmark_standard \
+  -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D \
+  -a causal=0 \
+  --disable-blocking-kernel --md "results_standard/non-causal.md"
 # Qwen 2.5 Coder-32B configuration
 S=1 Hqo=40 Hkv=8 D=128 && ./build/flash_attention_benchmark_standard \
   -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D \
@@ -60,7 +91,7 @@ S=1 Hqo=64 Hkv=8 D=128 && ./build/flash_attention_benchmark_standard \
 
 # Batch size scaling tests with Mixtral-like configuration
 echo "Testing batch size scaling..."
-for S in 1 2 4 8 16 32 64; do
+for S in 1 8 32 64; do
   Hqo=32 Hkv=8 D=128 && ./build/flash_attention_benchmark_standard \
     -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D \
     --disable-blocking-kernel --md "results_standard/batch-scaling-$S.md"
@@ -68,7 +99,7 @@ done
 
 # GQA ratio tests (increasingly important in modern LLMs)
 echo "Testing GQA ratio impact..."
-S=1 Hqo=32 && for R in 1 2 4 5 8 16 32; do
+S=1 Hqo=32 && for R in 1 4 8 32; do
   Hkv=$((Hqo / R))
   # Skip if division resulted in zero
   if [ $Hkv -gt 0 ]; then
@@ -80,7 +111,7 @@ done
 
 # Head dimension tests
 echo "Testing head dimension impact..."
-S=1 Hqo=32 Hkv=8 && for D in 56 64 80 96 128 160; do
+S=1 Hqo=32 Hkv=8 && for D in 56 80 128 160; do
   ./build/flash_attention_benchmark_standard \
     -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D \
     --disable-blocking-kernel --md "results_standard/headdim-$D.md"
@@ -94,7 +125,21 @@ echo "===== VARIABLE LENGTH ATTENTION BENCHMARKS ====="
 
 # Modern LLM configs with variable sequence lengths
 echo "Testing variable length sequences..."
+# Window attention tests for variable length
+echo "Testing sliding window with variable length..."
+S=8 Hqo=32 Hkv=8 D=128 L=4096 && for W in 128 512 1024; do
+  ./build/flash_attention_benchmark_varlen \
+    -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D \
+    -a seq_len=$L -a window_left=$W -a window_right=$W \
+    --disable-blocking-kernel --md "results_varlen/window-$W.md"
+done
 
+# Test non-causal attention with variable length
+echo "Testing non-causal attention with variable length..."
+S=8 Hqo=32 Hkv=8 D=128 L=4096 && ./build/flash_attention_benchmark_varlen \
+  -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D \
+  -a seq_len=$L -a causal=0 \
+  --disable-blocking-kernel --md "results_varlen/non-causal.md"
 # Mix of short and long sequences (GPT-2 to DeepSeek range)
 S=16 Hqo=32 Hkv=8 D=128 && ./build/flash_attention_benchmark_varlen \
   -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D \
@@ -102,7 +147,7 @@ S=16 Hqo=32 Hkv=8 D=128 && ./build/flash_attention_benchmark_varlen \
 
 # GQA ratio impact for variable-length sequences
 echo "Testing GQA ratio impact with variable length..."
-S=16 D=128 && for R in 1 4 8; do
+S=16 D=128 && for R in 1 4 8 32; do
   Hqo=32 Hkv=$((Hqo / R))
   ./build/flash_attention_benchmark_varlen \
     -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D \
@@ -111,7 +156,7 @@ done
 
 # Head dimension impact for variable-length sequences
 echo "Testing head dimension impact with variable length..."
-S=16 Hqo=32 Hkv=8 && for D in 64 96 128; do
+S=16 Hqo=32 Hkv=8 && for D in 56 80 128 160; do
   ./build/flash_attention_benchmark_varlen \
     -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D \
     -a seq_len=4096 --disable-blocking-kernel --md "results_varlen/headdim-$D.md"
@@ -138,7 +183,21 @@ echo "===== KV CACHE ATTENTION BENCHMARKS ====="
 
 # Modern LLM model configurations with KV caching
 echo "Testing modern LLM configurations with KV cache..."
+# Window attention tests for KV cache
+echo "Testing sliding window with KV cache..."
+S=1 Hqo=32 Hkv=8 D=128 P=256 L=16384 && for W in 128 1024 4096; do
+  ./build/flash_attention_benchmark_kvcache \
+    -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D \
+    -a page_size=$P -a seq_len=$L -a window_left=$W -a window_right=$W \
+    --disable-blocking-kernel --md "results_kvcache/window-$W.md"
+done
 
+# Test non-causal attention with KV cache
+echo "Testing non-causal attention with KV cache..."
+S=1 Hqo=32 Hkv=8 D=128 P=256 L=16384 && ./build/flash_attention_benchmark_kvcache \
+  -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D \
+  -a page_size=$P -a seq_len=$L -a causal=0 \
+  --disable-blocking-kernel --md "results_kvcache/non-causal.md"
 # Qwen 2.5 configuration
 S=1 Hqo=40 Hkv=8 D=128 P=256 && ./build/flash_attention_benchmark_kvcache \
   -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P \
@@ -169,7 +228,7 @@ S=1 Hqo=32 Hkv=32 D=128 P=256 && ./build/flash_attention_benchmark_kvcache \
 
 # Batch size scaling tests
 echo "Testing batch size scaling with KV cache..."
-for S in 1 2 4 8 16 32; do
+for S in 1 8 32 64; do
   Hqo=32 Hkv=8 D=128 P=256 && ./build/flash_attention_benchmark_kvcache \
     -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P \
     --disable-blocking-kernel --md "results_kvcache/batch-scaling-$S.md"
@@ -185,7 +244,7 @@ done
 
 # Page size impact
 echo "Testing page size impact with KV cache..."
-for P in 128 256 512 1024 2048; do
+for P in 128 512 1024 2048; do
   S=1 Hqo=32 Hkv=8 D=128 && ./build/flash_attention_benchmark_kvcache \
     -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P \
     --disable-blocking-kernel --md "results_kvcache/pagesize-$P.md"
@@ -193,7 +252,7 @@ done
 
 # GQA ratio tests in KV cache context
 echo "Testing GQA ratio impact with KV cache..."
-S=1 D=128 P=256 && for R in 1 4 5 8; do
+S=1 D=128 P=256 && for R in 1 4 8 32; do
   Hqo=32 Hkv=$((Hqo / R))
   ./build/flash_attention_benchmark_kvcache \
     -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D -a page_size=$P \
