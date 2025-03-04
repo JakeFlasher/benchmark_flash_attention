@@ -1,0 +1,8 @@
+Starting parallel NCU profiling across multiple GPUs...
+Using NCU path: ncu
+All profiling jobs started in parallel.
+Standard Part 1 (GPU 0): PID 12185 - Log: ./logs/standard_part1.log
+Standard Part 2 (GPU 1): PID 12186 - Log: ./logs/standard_part2.log
+Variable Length (GPU 2): PID 12187 - Log: ./logs/varlen.log
+KV Cache (GPU 3): PID 12188 - Log: ./logs/kvcache.log
+Waiting for all profiling jobs to complete...
