@@ -1,0 +1,861 @@
+
+# Export environment variables directly like your working script
+export CUDA_VISIBLE_DEVICES=$gpu_id
+export LD_LIBRARY_PATH=$(dirname $(python -c 'import torch; print(torch.__file__)'))/lib/
+
+mkdir -p ./results_standard
+mkdir -p ./results_varlen
+mkdir -p ./results_kvcache
+mkdir -p ./test_ncu_reports/standard
+mkdir -p ./test_ncu_reports/varlen
+mkdir -p ./test_ncu_reports/kvcache
+
+# =====================================================
+# STANDARD ATTENTION BENCHMARKS
+# =====================================================
+
+echo "===== STANDARD ATTENTION BENCHMARKS ====="
+===== STANDARD ATTENTION BENCHMARKS =====
+
+# Modern LLM model configurations
+echo "Testing modern LLM configurations..."
+Testing modern LLM configurations...
+# Window attention tests
+echo "Testing sliding window attention..."
+Testing sliding window attention...
+S=1 Hqo=32 Hkv=8 D=128
+for W in 128 512 1024; do
+  # Define output files directly without using process substitution
+  ncu_file="./test_ncu_reports/standard/window-$W.none.ncu-rep"
+  md_file="./test_ncu_reports/standard/window-$W.md"
+  
+  # Match the exact format and ordering of the working script
+  $ncu_path --metrics \
+l1tex__t_sector_hit_rate.pct,\
+l1tex__t_sector_pipe_lsu_mem_global_op_ld_hit_rate.pct,\
+lts__t_sector_hit_rate.pct,\
+l1tex__t_requests_pipe_lsu_mem_global_op_ld.sum,\
+l1tex__t_requests_pipe_lsu_mem_global_op_st.sum,\
+l1tex__t_requests_pipe_lsu_mem_local_op_ld.sum,\
+l1tex__t_requests_pipe_lsu_mem_local_op_st.sum,\
+l1tex__t_requests_pipe_tex_mem_surface_op_ld.sum,\
+l1tex__t_requests_pipe_tex_mem_texture.sum,\
+l1tex__t_requests_pipe_tex_mem_surface_op_st.sum,\
+l1tex__t_requests_pipe_lsu_mem_global_op_red.sum,\
+l1tex__t_requests_pipe_tex_mem_surface_op_red.sum,\
+l1tex__t_requests_pipe_lsu_mem_global_op_atom.sum,\
+l1tex__t_requests_pipe_tex_mem_surface_op_atom.sum,\
+l1tex__t_sectors_pipe_lsu_mem_global_op_ld.sum,\
+l1tex__t_sectors_pipe_lsu_mem_global_op_st.sum,\
+l1tex__m_xbar2l1tex_read_sectors_mem_lg_op_ld.sum,\
+l1tex__m_l1tex2xbar_write_sectors_mem_lg_op_st.sum,\
+lts__t_requests_srcunit_tex.sum,\
+dram__sectors_read.sum,\
+dram__sectors_write.sum,\
+dram__bytes.sum.per_second,\
+gpc__cycles_elapsed.max,\
+sm__cycles_active.avg,\
+gpc__cycles_elapsed.avg.per_second,\
+dram__cycles_elapsed.avg.per_second,\
+gpu__time_duration.sum,\
+sm__inst_executed.avg.per_cycle_elapsed,\
+smsp__inst_executed.sum,\
+gpu__compute_memory_access_throughput.avg.pct_of_peak_sustained_elapsed,\
+gpu__compute_memory_request_throughput.avg.pct_of_peak_sustained_elapsed,\
+sm__memory_throughput.avg.pct_of_peak_sustained_elapsed,\
+launch__occupancy_limit_blocks,\
+launch__occupancy_limit_registers,\
+launch__occupancy_limit_shared_mem,\
+launch__occupancy_limit_warps,\
+sm__maximum_warps_avg_per_active_cycle,\
+sm__maximum_warps_per_active_cycle_pct,\
+sm__warps_active.avg.per_cycle_active,\
+sm__warps_active.avg.pct_of_peak_sustained_active \
+  --profile-from-start on \
+  --export "$ncu_file" \
+  --force-overwrite \
+  --replay-mode kernel \
+  --clock-control none \
+  --cache-control none \
+  ./build/flash_attention_benchmark_standard \
+  -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D \
+  -a window_left=$W -a window_right=$W \
+  --disable-blocking-kernel --md "$md_file"
+done
+==WARNING== Note: Running with uncontrolled GPU caches. Profiling results may be inconsistent.
+==WARNING== Note: Running with unmodified GPU clocks. If not controlled otherwise, profiling results may be inconsistent.
+==PROF== Connected to process 56402 (/home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/build/flash_attention_benchmark_standard)
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23771 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=0]
+==PROF== Profiling "distribution_elementwise_grid..." - 0: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 1: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 2: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 3: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 4: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 5: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 6: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 7: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 8: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (15.84s) while over noise threshold (23.55% > 0.50%)
+Warn: Current measurement timed out (15.84s) before accumulating min_samples (5 < 10)
+Pass: Cold: 3168.295703ms GPU, 3168.317254ms CPU, 15.84s total GPU, 15.84s total wall, 5x 
+==PROF== Profiling "flash_fwd_kernel" - 9: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 10: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 11: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 12: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 13: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 14: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (15.94s) before accumulating min_samples (5 < 10)
+Pass: Batch: 3187.487158ms GPU, 15.94s total GPU, 15.94s total wall, 5x
+Run:  [2/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=0]
+==PROF== Profiling "distribution_elementwise_grid..." - 15: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 16: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 17: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 18: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 19: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 20: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 21: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 22: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 23: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.01s) while over noise threshold (23.67% > 0.50%)
+Warn: Current measurement timed out (16.01s) before accumulating min_samples (5 < 10)
+Pass: Cold: 3201.748193ms GPU, 3201.770252ms CPU, 16.01s total GPU, 16.01s total wall, 5x 
+==PROF== Profiling "flash_fwd_kernel" - 24: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 25: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 26: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 27: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 28: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 29: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.02s) before accumulating min_samples (5 < 10)
+Pass: Batch: 3204.786426ms GPU, 16.02s total GPU, 16.02s total wall, 5x
+Run:  [3/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=0]
+==PROF== Profiling "distribution_elementwise_grid..." - 30: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 31: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 32: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 33: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 34: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 35: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 36: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 37: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 38: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (17.55s) while over noise threshold (21.87% > 0.50%)
+Warn: Current measurement timed out (17.55s) before accumulating min_samples (5 < 10)
+Pass: Cold: 3510.548145ms GPU, 3510.572089ms CPU, 17.55s total GPU, 17.55s total wall, 5x 
+==PROF== Profiling "flash_fwd_kernel" - 39: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 40: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 41: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 42: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 43: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.18s) before accumulating min_samples (4 < 10)
+Pass: Batch: 4043.741760ms GPU, 16.17s total GPU, 16.18s total wall, 4x
+Run:  [4/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=0]
+==PROF== Profiling "distribution_elementwise_grid..." - 44: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 45: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 46: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 47: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 48: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 49: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 50: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 51: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.19s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (16.19s) before accumulating min_samples (4 < 10)
+Pass: Cold: 4046.617859ms GPU, 4046.645012ms CPU, 16.19s total GPU, 16.19s total wall, 4x 
+==PROF== Profiling "flash_fwd_kernel" - 52: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 53: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 54: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 55: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 56: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 57: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 58: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (15.87s) before accumulating min_samples (6 < 10)
+Pass: Batch: 2645.802205ms GPU, 15.87s total GPU, 15.87s total wall, 6x
+Run:  [5/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=0]
+==PROF== Profiling "distribution_elementwise_grid..." - 59: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 60: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 61: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 62: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 63: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 64: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 65: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 66: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 67: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 68: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (17.42s) while over noise threshold (19.30% > 0.50%)
+Warn: Current measurement timed out (17.42s) before accumulating min_samples (6 < 10)
+Pass: Cold: 2902.732096ms GPU, 2902.754406ms CPU, 17.42s total GPU, 17.42s total wall, 6x 
+==PROF== Profiling "flash_fwd_kernel" - 69: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 70: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 71: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 72: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 73: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.20s) before accumulating min_samples (4 < 10)
+Pass: Batch: 4048.832275ms GPU, 16.20s total GPU, 16.20s total wall, 4x
+Run:  [6/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=1]
+==PROF== Profiling "distribution_elementwise_grid..." - 74: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 75: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 76: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 77: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 78: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 79: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 80: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 81: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 82: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (15.83s) while over noise threshold (25.07% > 0.50%)
+Warn: Current measurement timed out (15.83s) before accumulating min_samples (5 < 10)
+Pass: Cold: 3165.402930ms GPU, 3165.427060ms CPU, 15.83s total GPU, 15.83s total wall, 5x 
+==PROF== Profiling "flash_fwd_kernel" - 83: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 84: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 85: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 86: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 87: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 88: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (18.88s) before accumulating min_samples (5 < 10)
+Pass: Batch: 3776.738525ms GPU, 18.88s total GPU, 18.88s total wall, 5x
+Run:  [7/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=1]
+==PROF== Profiling "distribution_elementwise_grid..." - 89: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 90: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 91: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 92: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 93: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 94: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 95: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 96: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 97: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (17.39s) while over noise threshold (35.29% > 0.50%)
+Warn: Current measurement timed out (17.39s) before accumulating min_samples (5 < 10)
+Pass: Cold: 3477.981982ms GPU, 3478.007409ms CPU, 17.39s total GPU, 17.39s total wall, 5x 
+==PROF== Profiling "flash_fwd_kernel" - 98: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 99: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 100: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 101: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 102: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (18.99s) before accumulating min_samples (4 < 10)
+Pass: Batch: 4747.610535ms GPU, 18.99s total GPU, 18.99s total wall, 4x
+Run:  [8/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=1]
+==PROF== Profiling "distribution_elementwise_grid..." - 103: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 104: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 105: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 106: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 107: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 108: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 109: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 110: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 111: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 112: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (17.14s) while over noise threshold (20.92% > 0.50%)
+Warn: Current measurement timed out (17.14s) before accumulating min_samples (6 < 10)
+Pass: Cold: 2855.993164ms GPU, 2856.023413ms CPU, 17.14s total GPU, 17.14s total wall, 6x 
+==PROF== Profiling "flash_fwd_kernel" - 113: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 114: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 115: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 116: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 117: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 118: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (15.90s) before accumulating min_samples (5 < 10)
+Pass: Batch: 3179.047461ms GPU, 15.90s total GPU, 15.90s total wall, 5x
+Run:  [9/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=1]
+==PROF== Profiling "distribution_elementwise_grid..." - 119: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 120: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 121: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 122: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 123: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 124: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 125: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.62s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (16.62s) before accumulating min_samples (3 < 10)
+Pass: Cold: 5538.981120ms GPU, 5539.016251ms CPU, 16.62s total GPU, 16.62s total wall, 3x 
+==PROF== Profiling "flash_fwd_kernel" - 126: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 127: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 128: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 129: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 130: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 131: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (18.82s) before accumulating min_samples (5 < 10)
+Pass: Batch: 3763.043311ms GPU, 18.82s total GPU, 18.82s total wall, 5x
+Run:  [10/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=1]
+==PROF== Profiling "distribution_elementwise_grid..." - 132: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 133: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 134: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 135: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 136: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 137: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.54s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (16.54s) before accumulating min_samples (2 < 10)
+Pass: Cold: 8271.048340ms GPU, 8271.095480ms CPU, 16.54s total GPU, 16.54s total wall, 2x 
+==PROF== Profiling "flash_fwd_kernel" - 138: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 139: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 140: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 141: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 142: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (27.67s) before accumulating min_samples (4 < 10)
+Pass: Batch: 6917.917969ms GPU, 27.67s total GPU, 27.67s total wall, 4x
+==PROF== Disconnected from process 56402
+```
+
+# Benchmark Results
+
+## run_mha_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | window_left | window_right | causal |  Q Tensor  |  K Tensor  |  V Tensor  |   Output   | Tokens |  Est. FLOPS  | Memory Usage | Samples | CPU Time | Noise  | GPU Time | Noise  | Elem/s  | GlobalMem BW | BWUtil | Samples | Batch GPU |
+|----------|---------|-----------|--------------|-----------|-------------|--------------|--------|------------|------------|------------|------------|--------|--------------|--------------|---------|----------|--------|----------|--------|---------|--------------|--------|---------|-----------|
+|        1 |     512 |        32 |            8 |       128 |         128 |          128 |      0 |  4.000 MiB |  1.000 MiB |  1.000 MiB |  4.000 MiB |    512 |   2147483648 |           10 |      5x |  3.168 s | 23.55% |  3.168 s | 23.55% | 161.601 |   3.310 MB/s |  0.00% |      5x |   3.187 s |
+|        1 |    1024 |        32 |            8 |       128 |         128 |          128 |      0 |  8.000 MiB |  2.000 MiB |  2.000 MiB |  8.000 MiB |   1024 |   8589934592 |           20 |      5x |  3.202 s | 23.67% |  3.202 s | 23.67% | 319.825 |   6.550 MB/s |  0.00% |      5x |   3.205 s |
+|        1 |    2048 |        32 |            8 |       128 |         128 |          128 |      0 | 16.000 MiB |  4.000 MiB |  4.000 MiB | 16.000 MiB |   2048 |  34359738368 |           40 |      5x |  3.511 s | 21.87% |  3.511 s | 21.87% | 583.385 |  11.948 MB/s |  0.00% |      4x |   4.044 s |
+|        1 |    4096 |        32 |            8 |       128 |         128 |          128 |      0 | 32.000 MiB |  8.000 MiB |  8.000 MiB | 32.000 MiB |   4096 | 137438953472 |           80 |      4x |  4.047 s |   inf% |  4.047 s |   inf% |  1.012K |  20.730 MB/s |  0.00% |      6x |   2.646 s |
+|        1 |    8192 |        32 |            8 |       128 |         128 |          128 |      0 | 64.000 MiB | 16.000 MiB | 16.000 MiB | 64.000 MiB |   8192 | 549755813888 |          160 |      6x |  2.903 s | 19.30% |  2.903 s | 19.30% |  2.822K |  57.798 MB/s |  0.01% |      4x |   4.049 s |
+|        1 |     512 |        32 |            8 |       128 |         128 |          128 |      1 |  4.000 MiB |  1.000 MiB |  1.000 MiB |  4.000 MiB |    512 |   2147483648 |           10 |      5x |  3.165 s | 25.07% |  3.165 s | 25.07% | 161.749 |   3.313 MB/s |  0.00% |      5x |   3.777 s |
+|        1 |    1024 |        32 |            8 |       128 |         128 |          128 |      1 |  8.000 MiB |  2.000 MiB |  2.000 MiB |  8.000 MiB |   1024 |   8589934592 |           20 |      5x |  3.478 s | 35.29% |  3.478 s | 35.29% | 294.424 |   6.030 MB/s |  0.00% |      4x |   4.748 s |
+|        1 |    2048 |        32 |            8 |       128 |         128 |          128 |      1 | 16.000 MiB |  4.000 MiB |  4.000 MiB | 16.000 MiB |   2048 |  34359738368 |           40 |      6x |  2.856 s | 20.92% |  2.856 s | 20.92% | 717.089 |  14.686 MB/s |  0.00% |      5x |   3.179 s |
+|        1 |    4096 |        32 |            8 |       128 |         128 |          128 |      1 | 32.000 MiB |  8.000 MiB |  8.000 MiB | 32.000 MiB |   4096 | 137438953472 |           80 |      3x |  5.539 s |   inf% |  5.539 s |   inf% | 739.486 |  15.145 MB/s |  0.00% |      5x |   3.763 s |
+|        1 |    8192 |        32 |            8 |       128 |         128 |          128 |      1 | 64.000 MiB | 16.000 MiB | 16.000 MiB | 64.000 MiB |   8192 | 549755813888 |          160 |      2x |  8.271 s |   inf% |  8.271 s |   inf% | 990.443 |  20.284 MB/s |  0.00% |      4x |   6.918 s |
+==PROF== Report: /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/./test_ncu_reports/standard/window-128.none.ncu-rep
+==WARNING== Note: Running with uncontrolled GPU caches. Profiling results may be inconsistent.
+==WARNING== Note: Running with unmodified GPU clocks. If not controlled otherwise, profiling results may be inconsistent.
+==PROF== Connected to process 56442 (/home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/build/flash_attention_benchmark_standard)
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23771 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=0]
+==PROF== Profiling "distribution_elementwise_grid..." - 0: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 1: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 2: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 3: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 4: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 5: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 6: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 7: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 8: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (17.29s) while over noise threshold (24.04% > 0.50%)
+Warn: Current measurement timed out (17.29s) before accumulating min_samples (5 < 10)
+Pass: Cold: 3458.682715ms GPU, 3458.706858ms CPU, 17.29s total GPU, 17.29s total wall, 5x 
+==PROF== Profiling "flash_fwd_kernel" - 9: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 10: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 11: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 12: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 13: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 14: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 15: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.25s) before accumulating min_samples (6 < 10)
+Pass: Batch: 2707.476115ms GPU, 16.24s total GPU, 16.25s total wall, 6x
+Run:  [2/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=0]
+==PROF== Profiling "distribution_elementwise_grid..." - 16: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 17: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 18: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 19: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 20: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 21: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 22: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 23: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 24: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (19.41s) while over noise threshold (67.75% > 0.50%)
+Warn: Current measurement timed out (19.41s) before accumulating min_samples (5 < 10)
+Pass: Cold: 3881.415137ms GPU, 3881.441639ms CPU, 19.41s total GPU, 19.41s total wall, 5x 
+==PROF== Profiling "flash_fwd_kernel" - 25: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 26: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 27: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 28: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 29: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 30: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 31: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (17.17s) before accumulating min_samples (6 < 10)
+Pass: Batch: 2862.395182ms GPU, 17.17s total GPU, 17.17s total wall, 6x
+Run:  [3/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=0]
+==PROF== Profiling "distribution_elementwise_grid..." - 32: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 33: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 34: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 35: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 36: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 37: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 38: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 39: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.18s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (16.18s) before accumulating min_samples (4 < 10)
+Pass: Cold: 4045.813660ms GPU, 4045.840493ms CPU, 16.18s total GPU, 16.18s total wall, 4x 
+==PROF== Profiling "flash_fwd_kernel" - 40: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 41: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 42: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 43: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 44: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.30s) before accumulating min_samples (4 < 10)
+Pass: Batch: 4075.962646ms GPU, 16.30s total GPU, 16.30s total wall, 4x
+Run:  [4/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=0]
+==PROF== Profiling "distribution_elementwise_grid..." - 45: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 46: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 47: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 48: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 49: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 50: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 51: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 52: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 53: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.33s) while over noise threshold (22.91% > 0.50%)
+Warn: Current measurement timed out (16.33s) before accumulating min_samples (5 < 10)
+Pass: Cold: 3265.616113ms GPU, 3265.640249ms CPU, 16.33s total GPU, 16.33s total wall, 5x 
+==PROF== Profiling "flash_fwd_kernel" - 54: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 55: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 56: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 57: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 58: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 59: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 60: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (18.82s) before accumulating min_samples (6 < 10)
+Pass: Batch: 3136.147583ms GPU, 18.82s total GPU, 18.82s total wall, 6x
+Run:  [5/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=0]
+==PROF== Profiling "distribution_elementwise_grid..." - 61: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 62: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 63: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 64: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 65: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 66: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 67: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 68: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 69: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (19.10s) while over noise threshold (16.37% > 0.50%)
+Warn: Current measurement timed out (19.10s) before accumulating min_samples (5 < 10)
+Pass: Cold: 3819.085938ms GPU, 3819.113399ms CPU, 19.10s total GPU, 19.10s total wall, 5x 
+==PROF== Profiling "flash_fwd_kernel" - 70: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 71: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 72: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 73: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 74: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.34s) before accumulating min_samples (4 < 10)
+Pass: Batch: 4085.743347ms GPU, 16.34s total GPU, 16.34s total wall, 4x
+Run:  [6/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=1]
+==PROF== Profiling "distribution_elementwise_grid..." - 75: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 76: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 77: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 78: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 79: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 80: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 81: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 82: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 83: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (17.51s) while over noise threshold (23.41% > 0.50%)
+Warn: Current measurement timed out (17.51s) before accumulating min_samples (5 < 10)
+Pass: Cold: 3502.742969ms GPU, 3502.767978ms CPU, 17.51s total GPU, 17.51s total wall, 5x 
+==PROF== Profiling "flash_fwd_kernel" - 84: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 85: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 86: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 87: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 88: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 89: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (15.84s) before accumulating min_samples (5 < 10)
+Pass: Batch: 3168.108545ms GPU, 15.84s total GPU, 15.84s total wall, 5x
+Run:  [7/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=1]
+==PROF== Profiling "distribution_elementwise_grid..." - 90: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 91: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 92: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 93: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 94: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 95: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 96: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 97: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (29.23s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (29.23s) before accumulating min_samples (4 < 10)
+Pass: Cold: 7307.075562ms GPU, 7307.117860ms CPU, 29.23s total GPU, 29.23s total wall, 4x 
+==PROF== Profiling "flash_fwd_kernel" - 98: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 99: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 100: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 101: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 102: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 103: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (15.87s) before accumulating min_samples (5 < 10)
+Pass: Batch: 3173.890820ms GPU, 15.87s total GPU, 15.87s total wall, 5x
+Run:  [8/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=1]
+==PROF== Profiling "distribution_elementwise_grid..." - 104: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 105: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 106: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 107: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 108: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 109: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 110: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 111: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 112: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (24.59s) while over noise threshold (71.63% > 0.50%)
+Warn: Current measurement timed out (24.59s) before accumulating min_samples (5 < 10)
+Pass: Cold: 4918.754346ms GPU, 4918.785912ms CPU, 24.59s total GPU, 24.59s total wall, 5x 
+==PROF== Profiling "flash_fwd_kernel" - 113: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 114: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 115: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 116: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 117: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 118: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (18.87s) before accumulating min_samples (5 < 10)
+Pass: Batch: 3774.547900ms GPU, 18.87s total GPU, 18.87s total wall, 5x
+Run:  [9/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=1]
+==PROF== Profiling "distribution_elementwise_grid..." - 119: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 120: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 121: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 122: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 123: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 124: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 125: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 126: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 127: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 128: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.89s) while over noise threshold (21.61% > 0.50%)
+Warn: Current measurement timed out (16.89s) before accumulating min_samples (6 < 10)
+Pass: Cold: 2814.570841ms GPU, 2814.592424ms CPU, 16.89s total GPU, 16.89s total wall, 6x 
+==PROF== Profiling "flash_fwd_kernel" - 129: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 130: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 131: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 132: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 133: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 134: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 135: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.94s) before accumulating min_samples (6 < 10)
+Pass: Batch: 2823.828451ms GPU, 16.94s total GPU, 16.94s total wall, 6x
+Run:  [10/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=1]
+==PROF== Profiling "distribution_elementwise_grid..." - 136: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 137: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 138: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 139: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 140: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 141: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 142: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (17.86s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (17.86s) before accumulating min_samples (3 < 10)
+Pass: Cold: 5954.364665ms GPU, 5954.401043ms CPU, 17.86s total GPU, 17.86s total wall, 3x 
+==PROF== Profiling "flash_fwd_kernel" - 143: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 144: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 145: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 146: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 147: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 148: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.03s) before accumulating min_samples (5 < 10)
+Pass: Batch: 3206.840039ms GPU, 16.03s total GPU, 16.03s total wall, 5x
+==PROF== Disconnected from process 56442
+```
+
+# Benchmark Results
+
+## run_mha_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | window_left | window_right | causal |  Q Tensor  |  K Tensor  |  V Tensor  |   Output   | Tokens |  Est. FLOPS  | Memory Usage | Samples | CPU Time | Noise  | GPU Time | Noise  | Elem/s  | GlobalMem BW | BWUtil | Samples | Batch GPU |
+|----------|---------|-----------|--------------|-----------|-------------|--------------|--------|------------|------------|------------|------------|--------|--------------|--------------|---------|----------|--------|----------|--------|---------|--------------|--------|---------|-----------|
+|        1 |     512 |        32 |            8 |       128 |         512 |          512 |      0 |  4.000 MiB |  1.000 MiB |  1.000 MiB |  4.000 MiB |    512 |   2147483648 |           10 |      5x |  3.459 s | 24.04% |  3.459 s | 24.04% | 148.033 |   3.032 MB/s |  0.00% |      6x |   2.707 s |
+|        1 |    1024 |        32 |            8 |       128 |         512 |          512 |      0 |  8.000 MiB |  2.000 MiB |  2.000 MiB |  8.000 MiB |   1024 |   8589934592 |           20 |      5x |  3.881 s | 67.75% |  3.881 s | 67.75% | 263.821 |   5.403 MB/s |  0.00% |      6x |   2.862 s |
+|        1 |    2048 |        32 |            8 |       128 |         512 |          512 |      0 | 16.000 MiB |  4.000 MiB |  4.000 MiB | 16.000 MiB |   2048 |  34359738368 |           40 |      4x |  4.046 s |   inf% |  4.046 s |   inf% | 506.202 |  10.367 MB/s |  0.00% |      4x |   4.076 s |
+|        1 |    4096 |        32 |            8 |       128 |         512 |          512 |      0 | 32.000 MiB |  8.000 MiB |  8.000 MiB | 32.000 MiB |   4096 | 137438953472 |           80 |      5x |  3.266 s | 22.91% |  3.266 s | 22.91% |  1.254K |  25.688 MB/s |  0.00% |      6x |   3.136 s |
+|        1 |    8192 |        32 |            8 |       128 |         512 |          512 |      0 | 64.000 MiB | 16.000 MiB | 16.000 MiB | 64.000 MiB |   8192 | 549755813888 |          160 |      5x |  3.819 s | 16.37% |  3.819 s | 16.37% |  2.145K |  43.930 MB/s |  0.00% |      4x |   4.086 s |
+|        1 |     512 |        32 |            8 |       128 |         512 |          512 |      1 |  4.000 MiB |  1.000 MiB |  1.000 MiB |  4.000 MiB |    512 |   2147483648 |           10 |      5x |  3.503 s | 23.41% |  3.503 s | 23.41% | 146.171 |   2.994 MB/s |  0.00% |      5x |   3.168 s |
+|        1 |    1024 |        32 |            8 |       128 |         512 |          512 |      1 |  8.000 MiB |  2.000 MiB |  2.000 MiB |  8.000 MiB |   1024 |   8589934592 |           20 |      4x |  7.307 s |   inf% |  7.307 s |   inf% | 140.138 |   2.870 MB/s |  0.00% |      5x |   3.174 s |
+|        1 |    2048 |        32 |            8 |       128 |         512 |          512 |      1 | 16.000 MiB |  4.000 MiB |  4.000 MiB | 16.000 MiB |   2048 |  34359738368 |           40 |      5x |  4.919 s | 71.63% |  4.919 s | 71.63% | 416.366 |   8.527 MB/s |  0.00% |      5x |   3.775 s |
+|        1 |    4096 |        32 |            8 |       128 |         512 |          512 |      1 | 32.000 MiB |  8.000 MiB |  8.000 MiB | 32.000 MiB |   4096 | 137438953472 |           80 |      6x |  2.815 s | 21.61% |  2.815 s | 21.61% |  1.455K |  29.804 MB/s |  0.00% |      6x |   2.824 s |
+|        1 |    8192 |        32 |            8 |       128 |         512 |          512 |      1 | 64.000 MiB | 16.000 MiB | 16.000 MiB | 64.000 MiB |   8192 | 549755813888 |          160 |      3x |  5.954 s |   inf% |  5.954 s |   inf% |  1.376K |  28.176 MB/s |  0.00% |      5x |   3.207 s |
+==PROF== Report: /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/./test_ncu_reports/standard/window-512.none.ncu-rep
+==WARNING== Note: Running with uncontrolled GPU caches. Profiling results may be inconsistent.
+==WARNING== Note: Running with unmodified GPU clocks. If not controlled otherwise, profiling results may be inconsistent.
+==PROF== Connected to process 56476 (/home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/build/flash_attention_benchmark_standard)
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23771 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=0]
+==PROF== Profiling "distribution_elementwise_grid..." - 0: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 1: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 2: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 3: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 4: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 5: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 6: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 7: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 8: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.19s) while over noise threshold (23.72% > 0.50%)
+Warn: Current measurement timed out (16.19s) before accumulating min_samples (5 < 10)
+Pass: Cold: 3238.278711ms GPU, 3238.302000ms CPU, 16.19s total GPU, 16.19s total wall, 5x 
+==PROF== Profiling "flash_fwd_kernel" - 9: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 10: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 11: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 12: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 13: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (18.16s) before accumulating min_samples (4 < 10)
+Pass: Batch: 4540.559265ms GPU, 18.16s total GPU, 18.16s total wall, 4x
+Run:  [2/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=0]
+==PROF== Profiling "distribution_elementwise_grid..." - 14: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 15: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 16: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 17: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 18: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 19: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 20: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 21: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 22: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (17.29s) while over noise threshold (24.45% > 0.50%)
+Warn: Current measurement timed out (17.29s) before accumulating min_samples (5 < 10)
+Pass: Cold: 3457.618555ms GPU, 3457.642640ms CPU, 17.29s total GPU, 17.29s total wall, 5x 
+==PROF== Profiling "flash_fwd_kernel" - 23: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 24: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 25: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 26: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 27: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (17.67s) before accumulating min_samples (4 < 10)
+Pass: Batch: 4417.072693ms GPU, 17.67s total GPU, 17.67s total wall, 4x
+Run:  [3/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=0]
+==PROF== Profiling "distribution_elementwise_grid..." - 28: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 29: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 30: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 31: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 32: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 33: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 34: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 35: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 36: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (17.74s) while over noise threshold (22.19% > 0.50%)
+Warn: Current measurement timed out (17.74s) before accumulating min_samples (5 < 10)
+Pass: Cold: 3548.791895ms GPU, 3548.816883ms CPU, 17.74s total GPU, 17.74s total wall, 5x 
+==PROF== Profiling "flash_fwd_kernel" - 37: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 38: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 39: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 40: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 41: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 42: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.10s) before accumulating min_samples (5 < 10)
+Pass: Batch: 3219.220898ms GPU, 16.10s total GPU, 16.10s total wall, 5x
+Run:  [4/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=0]
+==PROF== Profiling "distribution_elementwise_grid..." - 43: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 44: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 45: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 46: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 47: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 48: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 49: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 50: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (15.05s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (15.05s) before accumulating min_samples (4 < 10)
+Pass: Cold: 3762.517700ms GPU, 3762.545380ms CPU, 15.05s total GPU, 15.05s total wall, 4x 
+==PROF== Profiling "flash_fwd_kernel" - 51: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 52: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 53: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 54: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 55: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (17.76s) before accumulating min_samples (4 < 10)
+Pass: Batch: 4441.018921ms GPU, 17.76s total GPU, 17.76s total wall, 4x
+Run:  [5/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=0]
+==PROF== Profiling "distribution_elementwise_grid..." - 56: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 57: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 58: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 59: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 60: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 61: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 62: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 63: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 64: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (17.61s) while over noise threshold (21.65% > 0.50%)
+Warn: Current measurement timed out (17.61s) before accumulating min_samples (5 < 10)
+Pass: Cold: 3522.002881ms GPU, 3522.027779ms CPU, 17.61s total GPU, 17.61s total wall, 5x 
+==PROF== Profiling "flash_fwd_kernel" - 65: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 66: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 67: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 68: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 69: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (15.13s) before accumulating min_samples (4 < 10)
+Pass: Batch: 3782.836792ms GPU, 15.13s total GPU, 15.13s total wall, 4x
+Run:  [6/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=1]
+==PROF== Profiling "distribution_elementwise_grid..." - 70: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 71: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 72: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 73: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 74: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 75: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 76: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 77: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.42s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (16.42s) before accumulating min_samples (4 < 10)
+Pass: Cold: 4105.885864ms GPU, 4105.915039ms CPU, 16.42s total GPU, 16.42s total wall, 4x 
+==PROF== Profiling "flash_fwd_kernel" - 78: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 79: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 80: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 81: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 82: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 83: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (17.52s) before accumulating min_samples (5 < 10)
+Pass: Batch: 3504.862744ms GPU, 17.52s total GPU, 17.52s total wall, 5x
+Run:  [7/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=1]
+==PROF== Profiling "distribution_elementwise_grid..." - 84: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 85: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 86: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 87: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 88: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 89: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 90: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 91: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (15.13s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (15.13s) before accumulating min_samples (4 < 10)
+Pass: Cold: 3783.190491ms GPU, 3783.216738ms CPU, 15.13s total GPU, 15.13s total wall, 4x 
+==PROF== Profiling "flash_fwd_kernel" - 92: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 93: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 94: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 95: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 96: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.22s) before accumulating min_samples (4 < 10)
+Pass: Batch: 4055.008301ms GPU, 16.22s total GPU, 16.22s total wall, 4x
+Run:  [8/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=1]
+==PROF== Profiling "distribution_elementwise_grid..." - 97: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 98: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 99: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 100: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 101: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 102: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 103: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 104: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 105: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (17.49s) while over noise threshold (24.04% > 0.50%)
+Warn: Current measurement timed out (17.49s) before accumulating min_samples (5 < 10)
+Pass: Cold: 3497.395605ms GPU, 3497.420920ms CPU, 17.49s total GPU, 17.49s total wall, 5x 
+==PROF== Profiling "flash_fwd_kernel" - 106: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 107: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 108: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 109: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 110: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 111: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 112: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (17.05s) before accumulating min_samples (6 < 10)
+Pass: Batch: 2841.205363ms GPU, 17.05s total GPU, 17.05s total wall, 6x
+Run:  [9/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=1]
+==PROF== Profiling "distribution_elementwise_grid..." - 113: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 114: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 115: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 116: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 117: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 118: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 119: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.41s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (16.41s) before accumulating min_samples (3 < 10)
+Pass: Cold: 5468.587240ms GPU, 5468.621640ms CPU, 16.41s total GPU, 16.41s total wall, 3x 
+==PROF== Profiling "flash_fwd_kernel" - 120: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 121: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 122: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 123: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 124: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 125: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 126: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (17.31s) before accumulating min_samples (6 < 10)
+Pass: Batch: 2884.433919ms GPU, 17.31s total GPU, 17.31s total wall, 6x
+Run:  [10/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=1]
+==PROF== Profiling "distribution_elementwise_grid..." - 127: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 128: 0%....50%....100% - 13 passes
+==PROF== Profiling "distribution_elementwise_grid..." - 129: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 130: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 131: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 132: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 133: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 134: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 135: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 136: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (18.90s) while over noise threshold (23.59% > 0.50%)
+Warn: Current measurement timed out (18.90s) before accumulating min_samples (6 < 10)
+Pass: Cold: 3150.667440ms GPU, 3150.691122ms CPU, 18.90s total GPU, 18.90s total wall, 6x 
+==PROF== Profiling "flash_fwd_kernel" - 137: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 138: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 139: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 140: 0%....50%....100% - 13 passes
+==PROF== Profiling "flash_fwd_kernel" - 141: 0%....50%....100% - 13 passes
+Warn: Current measurement timed out (16.42s) before accumulating min_samples (4 < 10)
+Pass: Batch: 4103.869141ms GPU, 16.42s total GPU, 16.42s total wall, 4x
+==PROF== Disconnected from process 56476
+```
+
+# Benchmark Results
+
+## run_mha_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | window_left | window_right | causal |  Q Tensor  |  K Tensor  |  V Tensor  |   Output   | Tokens |  Est. FLOPS  | Memory Usage | Samples | CPU Time | Noise  | GPU Time | Noise  | Elem/s  | GlobalMem BW | BWUtil | Samples | Batch GPU |
+|----------|---------|-----------|--------------|-----------|-------------|--------------|--------|------------|------------|------------|------------|--------|--------------|--------------|---------|----------|--------|----------|--------|---------|--------------|--------|---------|-----------|
+|        1 |     512 |        32 |            8 |       128 |        1024 |         1024 |      0 |  4.000 MiB |  1.000 MiB |  1.000 MiB |  4.000 MiB |    512 |   2147483648 |           10 |      5x |  3.238 s | 23.72% |  3.238 s | 23.72% | 158.109 |   3.238 MB/s |  0.00% |      4x |   4.541 s |
+|        1 |    1024 |        32 |            8 |       128 |        1024 |         1024 |      0 |  8.000 MiB |  2.000 MiB |  2.000 MiB |  8.000 MiB |   1024 |   8589934592 |           20 |      5x |  3.458 s | 24.45% |  3.458 s | 24.45% | 296.158 |   6.065 MB/s |  0.00% |      4x |   4.417 s |
+|        1 |    2048 |        32 |            8 |       128 |        1024 |         1024 |      0 | 16.000 MiB |  4.000 MiB |  4.000 MiB | 16.000 MiB |   2048 |  34359738368 |           40 |      5x |  3.549 s | 22.19% |  3.549 s | 22.19% | 577.098 |  11.819 MB/s |  0.00% |      5x |   3.219 s |
+|        1 |    4096 |        32 |            8 |       128 |        1024 |         1024 |      0 | 32.000 MiB |  8.000 MiB |  8.000 MiB | 32.000 MiB |   4096 | 137438953472 |           80 |      4x |  3.763 s |   inf% |  3.763 s |   inf% |  1.089K |  22.295 MB/s |  0.00% |      4x |   4.441 s |
+|        1 |    8192 |        32 |            8 |       128 |        1024 |         1024 |      0 | 64.000 MiB | 16.000 MiB | 16.000 MiB | 64.000 MiB |   8192 | 549755813888 |          160 |      5x |  3.522 s | 21.65% |  3.522 s | 21.65% |  2.326K |  47.635 MB/s |  0.01% |      4x |   3.783 s |
+|        1 |     512 |        32 |            8 |       128 |        1024 |         1024 |      1 |  4.000 MiB |  1.000 MiB |  1.000 MiB |  4.000 MiB |    512 |   2147483648 |           10 |      4x |  4.106 s |   inf% |  4.106 s |   inf% | 124.699 |   2.554 MB/s |  0.00% |      5x |   3.505 s |
+|        1 |    1024 |        32 |            8 |       128 |        1024 |         1024 |      1 |  8.000 MiB |  2.000 MiB |  2.000 MiB |  8.000 MiB |   1024 |   8589934592 |           20 |      4x |  3.783 s |   inf% |  3.783 s |   inf% | 270.671 |   5.543 MB/s |  0.00% |      4x |   4.055 s |
+|        1 |    2048 |        32 |            8 |       128 |        1024 |         1024 |      1 | 16.000 MiB |  4.000 MiB |  4.000 MiB | 16.000 MiB |   2048 |  34359738368 |           40 |      5x |  3.497 s | 24.04% |  3.497 s | 24.04% | 585.579 |  11.993 MB/s |  0.00% |      6x |   2.841 s |
+|        1 |    4096 |        32 |            8 |       128 |        1024 |         1024 |      1 | 32.000 MiB |  8.000 MiB |  8.000 MiB | 32.000 MiB |   4096 | 137438953472 |           80 |      3x |  5.469 s |   inf% |  5.469 s |   inf% | 749.005 |  15.340 MB/s |  0.00% |      6x |   2.884 s |
+|        1 |    8192 |        32 |            8 |       128 |        1024 |         1024 |      1 | 64.000 MiB | 16.000 MiB | 16.000 MiB | 64.000 MiB |   8192 | 549755813888 |          160 |      6x |  3.151 s | 23.59% |  3.151 s | 23.59% |  2.600K |  53.250 MB/s |  0.01% |      4x |   4.104 s |
+==PROF== Report: /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/./test_ncu_reports/standard/window-1024.none.ncu-rep
+# Calculate total execution time
+END_TIME=$(date +%s)
+DURATION=$((END_TIME - START_TIME))
+
+# Convert to hours, minutes, seconds
+HOURS=$((DURATION / 3600))
+MINUTES=$(( (DURATION % 3600) / 60 ))
+SECONDS=$((DURATION % 60))
+
+echo ""
+
+echo "=================================================================="
+==================================================================
+echo "                       BENCHMARK SUMMARY                          "
+                       BENCHMARK SUMMARY                          
+echo "=================================================================="
+==================================================================
+echo "Start time: $(date -d @$START_TIME)"
+Start time: Thu Mar  6 16:32:00 UTC 2025
+echo "End time:   $(date -d @$END_TIME)"
+End time:   Thu Mar  6 16:59:17 UTC 2025
+
+echo "----------------------------------------------------------------"
+----------------------------------------------------------------
+echo "Total execution time: $HOURS hours, $MINUTES minutes, $SECONDS seconds"
+Total execution time: 0 hours, 27 minutes, 17 seconds
+echo "                    = $DURATION seconds"
+                    = 1637 seconds
+
+----------------------"
+echo "GPU used: CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES"
+echo "NCU path: $ncu_path"
+echo "All profiling data saved to: ./ncu_reports/"
+./test2.sh: line 134: unexpected EOF while looking for matching `"'

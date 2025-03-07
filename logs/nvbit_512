@@ -1,0 +1,155 @@
+
+export CUDA_VISIBLE_DEVICES=3
+export LD_LIBRARY_PATH=$(dirname $(python -c 'import torch; print(torch.__file__)'))/lib/
+
+mkdir -p ./results_standard
+mkdir -p ./results_varlen
+mkdir -p ./results_kvcache
+# =====================================================
+# STANDARD ATTENTION BENCHMARKS
+# =====================================================
+
+echo "===== STANDARD ATTENTION BENCHMARKS ====="
+===== STANDARD ATTENTION BENCHMARKS =====
+
+# Modern LLM model configurations
+echo "Testing modern LLM configurations..."
+Testing modern LLM configurations...
+# Window attention tests
+echo "Testing sliding window attention..."
+Testing sliding window attention...
+# W = 128, 512, 1024
+S=1 Hqo=32 Hkv=8 D=128 && for W in 512; do
+TRACES_FOLDER="window-$W-traces"  LD_PRELOAD=./tracer_tool.so ./build/flash_attention_benchmark_standard \
+    -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D \
+    -a window_left=$W -a window_right=$W \
+    --disable-blocking-kernel --md "results_standard/window-$W.md"
+done
+------------- NVBit (NVidia Binary Instrumentation Tool v1.7.4) Loaded --------------
+NVBit core environment variables (mostly for nvbit-devs):
+ACK_CTX_INIT_LIMITATION = 0 - if set, no warning will be printed for nvbit_at_ctx_init()
+            NVDISASM = nvdisasm - override default nvdisasm found in PATH
+            NOBANNER = 0 - if set, does not print this banner
+       NO_EAGER_LOAD = 0 - eager module loading is turned on by NVBit to prevent potential NVBit tool deadlock, turn it off if you want to use the lazy module loading feature
+---------------------------------------------------------------------------------
+         INSTR_BEGIN = 0 - Beginning of the instruction interval where to apply instrumentation
+           INSTR_END = 4294967295 - End of the instruction interval where to apply instrumentation
+    EXCLUDE_PRED_OFF = 1 - Exclude predicated off instruction from count
+      TRACE_LINEINFO = 0 - Include source code line info at the start of each traced line. The target binary must be compiled with -lineinfo or --generate-line-info
+DYNAMIC_KERNEL_LIMIT_END = 0 - Limit of the number kernel to be printed, 0 means no limit
+DYNAMIC_KERNEL_LIMIT_START = 0 - start to report kernel from this kernel id, 0 means starts from the beginning, i.e. first kernel
+   ACTIVE_FROM_START = 1 - Start instruction tracing from start or wait for cuProfilerStart and cuProfilerStop. If set to 0, DYNAMIC_KERNEL_LIMIT options have no effect
+        TOOL_VERBOSE = 0 - Enable verbosity inside the tool
+       TOOL_COMPRESS = 1 - Enable traces compression
+     TOOL_TRACE_CORE = 0 - write the core id in the traces
+TERMINATE_UPON_LIMIT = 0 - Stop the process once the current kernel > DYNAMIC_KERNEL_LIMIT_END
+ TRACE_FILE_COMPRESS = 1 - Create xz-compressed tracefile
+       TRACES_FOLDER = window-512-traces - Stores traces in TRACES_FOLDER; defaults to cwd if unset.
+WARNING: Do not call CUDA memory allocation in nvbit_at_ctx_init(). It will cause deadlocks. Do them in nvbit_tool_init(). If you encounter deadlocks, remove CUDA API calls to debug.
+----------------------------------------------------------------------------------------------------
+
+Traces location is window-512-traces/run-0 
+Kernelslist location is window-512-traces/run-0/kernelslist 
+Stats location is window-512-traces/run-0/stats.csv 
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23677 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=0]
+Writing results to window-512-traces/run-0/kernel-1.trace.xz
+Writing results to window-512-traces/run-0/kernel-2.trace.xz
+Writing results to window-512-traces/run-0/kernel-3.trace.xz
+Writing results to window-512-traces/run-0/kernel-4.trace.xz
+Writing results to window-512-traces/run-0/kernel-5.trace.xz
+Writing results to window-512-traces/run-0/kernel-6.trace.xz
+Writing results to window-512-traces/run-0/kernel-7.trace.xz
+Writing results to window-512-traces/run-0/kernel-8.trace.xz
+Warn: Current measurement timed out (17.62s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (17.62s) before accumulating min_samples (4 < 10)
+Pass: Cold: 4405.289429ms GPU, 4405.345192ms CPU, 17.62s total GPU, 17.62s total wall, 4x 
+Writing results to window-512-traces/run-0/kernel-9.trace.xz
+Writing results to window-512-traces/run-0/kernel-10.trace.xz
+Writing results to window-512-traces/run-0/kernel-11.trace.xz
+Writing results to window-512-traces/run-0/kernel-12.trace.xz
+Writing results to window-512-traces/run-0/kernel-13.trace.xz
+Warn: Current measurement timed out (17.74s) before accumulating min_samples (4 < 10)
+Pass: Batch: 4435.995605ms GPU, 17.74s total GPU, 17.74s total wall, 4x
+Run:  [2/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=0]
+Writing results to window-512-traces/run-0/kernel-14.trace.xz
+Writing results to window-512-traces/run-0/kernel-15.trace.xz
+Writing results to window-512-traces/run-0/kernel-16.trace.xz
+Writing results to window-512-traces/run-0/kernel-17.trace.xz
+Writing results to window-512-traces/run-0/kernel-18.trace.xz
+Warn: Current measurement timed out (17.91s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (17.91s) before accumulating min_samples (1 < 10)
+Pass: Cold: 17913.041016ms GPU, 17913.245746ms CPU, 17.91s total GPU, 17.91s total wall, 1x 
+Writing results to window-512-traces/run-0/kernel-19.trace.xz
+Writing results to window-512-traces/run-0/kernel-20.trace.xz
+Warn: Current measurement timed out (17.84s) before accumulating min_samples (1 < 10)
+Pass: Batch: 17835.669922ms GPU, 17.84s total GPU, 17.84s total wall, 1x
+Run:  [3/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=0]
+Writing results to window-512-traces/run-0/kernel-21.trace.xz
+Writing results to window-512-traces/run-0/kernel-22.trace.xz
+Writing results to window-512-traces/run-0/kernel-23.trace.xz
+Writing results to window-512-traces/run-0/kernel-24.trace.xz
+Writing results to window-512-traces/run-0/kernel-25.trace.xz
+Warn: Current measurement timed out (42.08s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (42.08s) before accumulating min_samples (1 < 10)
+Pass: Cold: 42074.484375ms GPU, 42074.977981ms CPU, 42.07s total GPU, 42.08s total wall, 1x 
+Writing results to window-512-traces/run-0/kernel-26.trace.xz
+Writing results to window-512-traces/run-0/kernel-27.trace.xz
+Warn: Current measurement timed out (42.29s) before accumulating min_samples (1 < 10)
+Pass: Batch: 42288.367188ms GPU, 42.29s total GPU, 42.29s total wall, 1x
+Run:  [4/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=0]
+Writing results to window-512-traces/run-0/kernel-28.trace.xz
+Writing results to window-512-traces/run-0/kernel-29.trace.xz
+Writing results to window-512-traces/run-0/kernel-30.trace.xz
+Writing results to window-512-traces/run-0/kernel-31.trace.xz
+Writing results to window-512-traces/run-0/kernel-32.trace.xz
+Warn: Current measurement timed out (90.66s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (90.66s) before accumulating min_samples (1 < 10)
+Pass: Cold: 90660.882812ms GPU, 90661.924794ms CPU, 90.66s total GPU, 90.66s total wall, 1x 
+Writing results to window-512-traces/run-0/kernel-33.trace.xz
+Writing results to window-512-traces/run-0/kernel-34.trace.xz
+Warn: Current measurement timed out (90.95s) before accumulating min_samples (1 < 10)
+Pass: Batch: 90944.593750ms GPU, 90.94s total GPU, 90.95s total wall, 1x
+Run:  [5/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=0]
+Writing results to window-512-traces/run-0/kernel-35.trace.xz
+Writing results to window-512-traces/run-0/kernel-36.trace.xz
+Writing results to window-512-traces/run-0/kernel-37.trace.xz
+Writing results to window-512-traces/run-0/kernel-38.trace.xz
+Writing results to window-512-traces/run-0/kernel-39.trace.xz
+Warn: Current measurement timed out (188.01s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (188.01s) before accumulating min_samples (1 < 10)
+Pass: Cold: 188005.015625ms GPU, 188007.214514ms CPU, 188.01s total GPU, 188.01s total wall, 1x 
+sh: 0: getcwd() failed: No such file or directory
+Writing results to window-512-traces/run-0/kernel-40.trace.xz
+Writing results to window-512-traces/run-0/kernel-41.trace.xz
+Warn: Current measurement timed out (188.52s) before accumulating min_samples (1 < 10)
+Pass: Batch: 188518.937500ms GPU, 188.52s total GPU, 188.52s total wall, 1x
+Run:  [6/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=1]
+Writing results to window-512-traces/run-0/kernel-42.trace.xz
+Writing results to window-512-traces/run-0/kernel-43.trace.xz
+Writing results to window-512-traces/run-0/kernel-44.trace.xz
+Writing results to window-512-traces/run-0/kernel-45.trace.xz
+Writing results to window-512-traces/run-0/kernel-46.trace.xz
+Writing results to window-512-traces/run-0/kernel-47.trace.xz
+Writing results to window-512-traces/run-0/kernel-48.trace.xz
+Writing results to window-512-traces/run-0/kernel-49.trace.xz
+Writing results to window-512-traces/run-0/kernel-50.trace.xz
+Warn: Current measurement timed out (16.14s) before accumulating min_samples (5 < 10)
+Pass: Cold: 3228.535986ms GPU, 3228.584315ms CPU, 16.14s total GPU, 16.14s total wall, 5x 

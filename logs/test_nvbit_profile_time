@@ -1,0 +1,667 @@
+
+export CUDA_VISIBLE_DEVICES=2
+export LD_LIBRARY_PATH=$(dirname $(python -c 'import torch; print(torch.__file__)'))/lib/
+
+mkdir -p ./results_standard
+mkdir -p ./results_varlen
+mkdir -p ./results_kvcache
+# =====================================================
+# STANDARD ATTENTION BENCHMARKS
+# =====================================================
+
+echo "===== STANDARD ATTENTION BENCHMARKS ====="
+===== STANDARD ATTENTION BENCHMARKS =====
+
+# Modern LLM model configurations
+echo "Testing modern LLM configurations..."
+Testing modern LLM configurations...
+# Window attention tests
+echo "Testing sliding window attention..."
+Testing sliding window attention...
+S=1 Hqo=32 Hkv=8 D=128 && for W in 128 512 1024; do
+  LD_PRELOAD=./tracer_tool.so ./build/flash_attention_benchmark_standard \
+    -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D \
+    -a window_left=$W -a window_right=$W \
+    --disable-blocking-kernel --md "results_standard/window-$W.md"
+done
+------------- NVBit (NVidia Binary Instrumentation Tool v1.7.4) Loaded --------------
+NVBit core environment variables (mostly for nvbit-devs):
+ACK_CTX_INIT_LIMITATION = 0 - if set, no warning will be printed for nvbit_at_ctx_init()
+            NVDISASM = nvdisasm - override default nvdisasm found in PATH
+            NOBANNER = 0 - if set, does not print this banner
+       NO_EAGER_LOAD = 0 - eager module loading is turned on by NVBit to prevent potential NVBit tool deadlock, turn it off if you want to use the lazy module loading feature
+---------------------------------------------------------------------------------
+         INSTR_BEGIN = 0 - Beginning of the instruction interval where to apply instrumentation
+           INSTR_END = 4294967295 - End of the instruction interval where to apply instrumentation
+    EXCLUDE_PRED_OFF = 1 - Exclude predicated off instruction from count
+      TRACE_LINEINFO = 0 - Include source code line info at the start of each traced line. The target binary must be compiled with -lineinfo or --generate-line-info
+DYNAMIC_KERNEL_LIMIT_END = 0 - Limit of the number kernel to be printed, 0 means no limit
+DYNAMIC_KERNEL_LIMIT_START = 0 - start to report kernel from this kernel id, 0 means starts from the beginning, i.e. first kernel
+   ACTIVE_FROM_START = 1 - Start instruction tracing from start or wait for cuProfilerStart and cuProfilerStop. If set to 0, DYNAMIC_KERNEL_LIMIT options have no effect
+        TOOL_VERBOSE = 0 - Enable verbosity inside the tool
+       TOOL_COMPRESS = 1 - Enable traces compression
+     TOOL_TRACE_CORE = 0 - write the core id in the traces
+TERMINATE_UPON_LIMIT = 0 - Stop the process once the current kernel > DYNAMIC_KERNEL_LIMIT_END
+USER_DEFINED_FOLDERS = 0 - Uses the user defined folder TRACES_FOLDER path environment
+ TRACE_FILE_COMPRESS = 0 - Create xz-compressed tracefile
+WARNING: Do not call CUDA memory allocation in nvbit_at_ctx_init(). It will cause deadlocks. Do them in nvbit_tool_init(). If you encounter deadlocks, remove CUDA API calls to debug.
+----------------------------------------------------------------------------------------------------
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23679 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=0]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-1.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-1.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-2.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-2.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-3.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-3.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-4.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-4.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-5.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-5.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-6.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-6.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-7.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-7.trace)
+Warn: Current measurement timed out (16.11s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (16.11s) before accumulating min_samples (3 < 10)
+Pass: Cold: 5370.042318ms GPU, 5370.076639ms CPU, 16.11s total GPU, 16.11s total wall, 3x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-8.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-8.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-9.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-9.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-10.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-10.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-11.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-11.trace)
+Warn: Current measurement timed out (16.15s) before accumulating min_samples (3 < 10)
+Pass: Batch: 5383.565592ms GPU, 16.15s total GPU, 16.15s total wall, 3x
+Run:  [2/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=0]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-12.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-12.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-13.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-13.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-14.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-14.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-15.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-15.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-16.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-16.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-17.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-17.trace)
+Warn: Current measurement timed out (23.29s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (23.29s) before accumulating min_samples (2 < 10)
+Pass: Cold: 11645.172852ms GPU, 11645.238658ms CPU, 23.29s total GPU, 23.29s total wall, 2x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-18.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-18.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-19.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-19.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-20.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-20.trace)
+Warn: Current measurement timed out (23.53s) before accumulating min_samples (2 < 10)
+Pass: Batch: 11763.044434ms GPU, 23.53s total GPU, 23.53s total wall, 2x
+Run:  [3/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=0]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-21.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-21.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-22.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-22.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-23.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-23.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-24.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-24.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-25.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-25.trace)
+Warn: Current measurement timed out (24.32s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (24.32s) before accumulating min_samples (1 < 10)
+Pass: Cold: 24317.283203ms GPU, 24317.415435ms CPU, 24.32s total GPU, 24.32s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-26.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-26.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-27.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-27.trace)
+Warn: Current measurement timed out (24.45s) before accumulating min_samples (1 < 10)
+Pass: Batch: 24446.896484ms GPU, 24.45s total GPU, 24.45s total wall, 1x
+Run:  [4/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=0]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-28.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-28.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-29.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-29.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-30.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-30.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-31.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-31.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-32.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-32.trace)
+Warn: Current measurement timed out (48.94s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (48.94s) before accumulating min_samples (1 < 10)
+Pass: Cold: 48937.234375ms GPU, 48937.511559ms CPU, 48.94s total GPU, 48.94s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-33.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-33.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-34.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-34.trace)
+Warn: Current measurement timed out (49.05s) before accumulating min_samples (1 < 10)
+Pass: Batch: 49049.246094ms GPU, 49.05s total GPU, 49.05s total wall, 1x
+Run:  [5/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=0]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-35.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-35.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-36.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-36.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-37.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-37.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-38.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-38.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-39.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-39.trace)
+Warn: Current measurement timed out (98.56s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (98.56s) before accumulating min_samples (1 < 10)
+Pass: Cold: 98559.859375ms GPU, 98560.368264ms CPU, 98.56s total GPU, 98.56s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-40.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-40.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-41.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-41.trace)
+Warn: Current measurement timed out (98.50s) before accumulating min_samples (1 < 10)
+Pass: Batch: 98494.953125ms GPU, 98.49s total GPU, 98.50s total wall, 1x
+Run:  [6/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=1]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-42.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-42.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-43.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-43.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-44.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-44.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-45.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-45.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-46.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-46.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-47.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-47.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-48.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-48.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-49.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-49.trace)
+Warn: Current measurement timed out (16.16s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (16.16s) before accumulating min_samples (4 < 10)
+Pass: Cold: 4039.120056ms GPU, 4039.153080ms CPU, 16.16s total GPU, 16.16s total wall, 4x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-50.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-50.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-51.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-51.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-52.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-52.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-53.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-53.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-54.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-54.trace)
+Warn: Current measurement timed out (16.25s) before accumulating min_samples (4 < 10)
+Pass: Batch: 4062.118652ms GPU, 16.25s total GPU, 16.25s total wall, 4x
+Run:  [7/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=1]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-55.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-55.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-56.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-56.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-57.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-57.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-58.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-58.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-59.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-59.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-60.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-60.trace)
+Warn: Current measurement timed out (17.15s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (17.15s) before accumulating min_samples (2 < 10)
+Pass: Cold: 8572.896973ms GPU, 8572.952823ms CPU, 17.15s total GPU, 17.15s total wall, 2x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-61.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-61.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-62.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-62.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-63.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-63.trace)
+Warn: Current measurement timed out (17.16s) before accumulating min_samples (2 < 10)
+Pass: Batch: 8581.646484ms GPU, 17.16s total GPU, 17.16s total wall, 2x
+Run:  [8/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=1]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-64.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-64.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-65.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-65.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-66.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-66.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-67.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-67.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-68.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-68.trace)
+Warn: Current measurement timed out (17.52s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (17.52s) before accumulating min_samples (1 < 10)
+Pass: Cold: 17521.482422ms GPU, 17521.585004ms CPU, 17.52s total GPU, 17.52s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-69.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-69.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-70.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-70.trace)
+Warn: Current measurement timed out (17.65s) before accumulating min_samples (1 < 10)
+Pass: Batch: 17651.818359ms GPU, 17.65s total GPU, 17.65s total wall, 1x
+Run:  [9/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=1]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-71.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-71.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-72.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-72.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-73.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-73.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-74.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-74.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-75.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-75.trace)
+Warn: Current measurement timed out (35.04s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (35.04s) before accumulating min_samples (1 < 10)
+Pass: Cold: 35042.578125ms GPU, 35042.767120ms CPU, 35.04s total GPU, 35.04s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-76.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-76.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-77.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-77.trace)
+Warn: Current measurement timed out (35.71s) before accumulating min_samples (1 < 10)
+Pass: Batch: 35712.113281ms GPU, 35.71s total GPU, 35.71s total wall, 1x
+Run:  [10/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=8 head_size=128 window_left=128 window_right=128 causal=1]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-78.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-78.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-79.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-79.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-80.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-80.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-81.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-81.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-82.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-82.trace)
+Warn: Current measurement timed out (70.53s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (70.53s) before accumulating min_samples (1 < 10)
+Pass: Cold: 70526.898438ms GPU, 70527.265479ms CPU, 70.53s total GPU, 70.53s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-83.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-83.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-84.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-84.trace)
+Warn: Current measurement timed out (70.25s) before accumulating min_samples (1 < 10)
+Pass: Batch: 70244.859375ms GPU, 70.24s total GPU, 70.25s total wall, 1x
+```
+
+# Benchmark Results
+
+## run_mha_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | window_left | window_right | causal |  Q Tensor  |  K Tensor  |  V Tensor  |   Output   | Tokens |  Est. FLOPS  | Memory Usage | Samples | CPU Time | Noise | GPU Time | Noise | Elem/s  | GlobalMem BW | BWUtil | Samples | Batch GPU |
+|----------|---------|-----------|--------------|-----------|-------------|--------------|--------|------------|------------|------------|------------|--------|--------------|--------------|---------|----------|-------|----------|-------|---------|--------------|--------|---------|-----------|
+|        1 |     512 |        32 |            8 |       128 |         128 |          128 |      0 |  4.000 MiB |  1.000 MiB |  1.000 MiB |  4.000 MiB |    512 |   2147483648 |           10 |      3x |  5.370 s |  inf% |  5.370 s |  inf% |  95.344 |   1.953 MB/s |  0.00% |      3x |   5.384 s |
+|        1 |    1024 |        32 |            8 |       128 |         128 |          128 |      0 |  8.000 MiB |  2.000 MiB |  2.000 MiB |  8.000 MiB |   1024 |   8589934592 |           20 |      2x | 11.645 s |  inf% | 11.645 s |  inf% |  87.933 |   1.801 MB/s |  0.00% |      2x |  11.763 s |
+|        1 |    2048 |        32 |            8 |       128 |         128 |          128 |      0 | 16.000 MiB |  4.000 MiB |  4.000 MiB | 16.000 MiB |   2048 |  34359738368 |           40 |      1x | 24.317 s |  inf% | 24.317 s |  inf% |  84.220 |   1.725 MB/s |  0.00% |      1x |  24.447 s |
+|        1 |    4096 |        32 |            8 |       128 |         128 |          128 |      0 | 32.000 MiB |  8.000 MiB |  8.000 MiB | 32.000 MiB |   4096 | 137438953472 |           80 |      1x | 48.938 s |  inf% | 48.937 s |  inf% |  83.699 |   1.714 MB/s |  0.00% |      1x |  49.049 s |
+|        1 |    8192 |        32 |            8 |       128 |         128 |          128 |      0 | 64.000 MiB | 16.000 MiB | 16.000 MiB | 64.000 MiB |   8192 | 549755813888 |          160 |      1x | 98.560 s |  inf% | 98.560 s |  inf% |  83.117 |   1.702 MB/s |  0.00% |      1x |  98.495 s |
+|        1 |     512 |        32 |            8 |       128 |         128 |          128 |      1 |  4.000 MiB |  1.000 MiB |  1.000 MiB |  4.000 MiB |    512 |   2147483648 |           10 |      4x |  4.039 s |  inf% |  4.039 s |  inf% | 126.760 |   2.596 MB/s |  0.00% |      4x |   4.062 s |
+|        1 |    1024 |        32 |            8 |       128 |         128 |          128 |      1 |  8.000 MiB |  2.000 MiB |  2.000 MiB |  8.000 MiB |   1024 |   8589934592 |           20 |      2x |  8.573 s |  inf% |  8.573 s |  inf% | 119.446 |   2.446 MB/s |  0.00% |      2x |   8.582 s |
+|        1 |    2048 |        32 |            8 |       128 |         128 |          128 |      1 | 16.000 MiB |  4.000 MiB |  4.000 MiB | 16.000 MiB |   2048 |  34359738368 |           40 |      1x | 17.522 s |  inf% | 17.521 s |  inf% | 116.885 |   2.394 MB/s |  0.00% |      1x |  17.652 s |
+|        1 |    4096 |        32 |            8 |       128 |         128 |          128 |      1 | 32.000 MiB |  8.000 MiB |  8.000 MiB | 32.000 MiB |   4096 | 137438953472 |           80 |      1x | 35.043 s |  inf% | 35.043 s |  inf% | 116.886 |   2.394 MB/s |  0.00% |      1x |  35.712 s |
+|        1 |    8192 |        32 |            8 |       128 |         128 |          128 |      1 | 64.000 MiB | 16.000 MiB | 16.000 MiB | 64.000 MiB |   8192 | 549755813888 |          160 |      1x | 70.527 s |  inf% | 70.527 s |  inf% | 116.154 |   2.379 MB/s |  0.00% |      1x |  70.245 s |
+------------- NVBit (NVidia Binary Instrumentation Tool v1.7.4) Loaded --------------
+NVBit core environment variables (mostly for nvbit-devs):
+ACK_CTX_INIT_LIMITATION = 0 - if set, no warning will be printed for nvbit_at_ctx_init()
+            NVDISASM = nvdisasm - override default nvdisasm found in PATH
+            NOBANNER = 0 - if set, does not print this banner
+       NO_EAGER_LOAD = 0 - eager module loading is turned on by NVBit to prevent potential NVBit tool deadlock, turn it off if you want to use the lazy module loading feature
+---------------------------------------------------------------------------------
+         INSTR_BEGIN = 0 - Beginning of the instruction interval where to apply instrumentation
+           INSTR_END = 4294967295 - End of the instruction interval where to apply instrumentation
+    EXCLUDE_PRED_OFF = 1 - Exclude predicated off instruction from count
+      TRACE_LINEINFO = 0 - Include source code line info at the start of each traced line. The target binary must be compiled with -lineinfo or --generate-line-info
+DYNAMIC_KERNEL_LIMIT_END = 0 - Limit of the number kernel to be printed, 0 means no limit
+DYNAMIC_KERNEL_LIMIT_START = 0 - start to report kernel from this kernel id, 0 means starts from the beginning, i.e. first kernel
+   ACTIVE_FROM_START = 1 - Start instruction tracing from start or wait for cuProfilerStart and cuProfilerStop. If set to 0, DYNAMIC_KERNEL_LIMIT options have no effect
+        TOOL_VERBOSE = 0 - Enable verbosity inside the tool
+       TOOL_COMPRESS = 1 - Enable traces compression
+     TOOL_TRACE_CORE = 0 - write the core id in the traces
+TERMINATE_UPON_LIMIT = 0 - Stop the process once the current kernel > DYNAMIC_KERNEL_LIMIT_END
+USER_DEFINED_FOLDERS = 0 - Uses the user defined folder TRACES_FOLDER path environment
+ TRACE_FILE_COMPRESS = 0 - Create xz-compressed tracefile
+WARNING: Do not call CUDA memory allocation in nvbit_at_ctx_init(). It will cause deadlocks. Do them in nvbit_tool_init(). If you encounter deadlocks, remove CUDA API calls to debug.
+----------------------------------------------------------------------------------------------------
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23681 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=0]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-1.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-1.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-2.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-2.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-3.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-3.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-4.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-4.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-5.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-5.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-6.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-6.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-7.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-7.trace)
+Warn: Current measurement timed out (19.41s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (19.41s) before accumulating min_samples (3 < 10)
+Pass: Cold: 6469.406738ms GPU, 6469.449191ms CPU, 19.41s total GPU, 19.41s total wall, 3x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-8.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-8.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-9.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-9.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-10.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-10.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-11.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-11.trace)
+Warn: Current measurement timed out (19.31s) before accumulating min_samples (3 < 10)
+Pass: Batch: 6437.185872ms GPU, 19.31s total GPU, 19.31s total wall, 3x
+Run:  [2/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=0]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-12.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-12.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-13.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-13.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-14.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-14.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-15.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-15.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-16.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-16.trace)
+Warn: Current measurement timed out (25.25s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (25.25s) before accumulating min_samples (1 < 10)
+Pass: Cold: 25248.832031ms GPU, 25248.972630ms CPU, 25.25s total GPU, 25.25s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-17.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-17.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-18.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-18.trace)
+Warn: Current measurement timed out (25.35s) before accumulating min_samples (1 < 10)
+Pass: Batch: 25348.746094ms GPU, 25.35s total GPU, 25.35s total wall, 1x
+Run:  [3/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=0]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-19.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-19.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-20.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-20.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-21.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-21.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-22.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-22.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-23.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-23.trace)
+Warn: Current measurement timed out (58.39s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (58.39s) before accumulating min_samples (1 < 10)
+Pass: Cold: 58392.101562ms GPU, 58392.404063ms CPU, 58.39s total GPU, 58.39s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-24.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-24.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-25.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-25.trace)
+Warn: Current measurement timed out (58.50s) before accumulating min_samples (1 < 10)
+Pass: Batch: 58496.417969ms GPU, 58.50s total GPU, 58.50s total wall, 1x
+Run:  [4/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=0]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-26.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-26.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-27.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-27.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-28.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-28.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-29.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-29.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-30.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-30.trace)
+Warn: Current measurement timed out (125.77s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (125.77s) before accumulating min_samples (1 < 10)
+Pass: Cold: 125769.515625ms GPU, 125770.170224ms CPU, 125.77s total GPU, 125.77s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-31.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-31.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-32.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-32.trace)
+Warn: Current measurement timed out (126.04s) before accumulating min_samples (1 < 10)
+Pass: Batch: 126040.359375ms GPU, 126.04s total GPU, 126.04s total wall, 1x
+Run:  [5/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=0]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-33.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-33.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-34.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-34.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-35.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-35.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-36.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-36.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-37.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-37.trace)
+Warn: Current measurement timed out (258.78s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (258.78s) before accumulating min_samples (1 < 10)
+Pass: Cold: 258782.859375ms GPU, 258784.177504ms CPU, 258.78s total GPU, 258.78s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-38.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-38.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-39.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-39.trace)
+Warn: Current measurement timed out (258.10s) before accumulating min_samples (1 < 10)
+Pass: Batch: 258101.515625ms GPU, 258.10s total GPU, 258.10s total wall, 1x
+Run:  [6/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=1]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-40.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-40.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-41.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-41.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-42.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-42.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-43.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-43.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-44.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-44.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-45.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-45.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-46.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-46.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-47.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-47.trace)
+Warn: Current measurement timed out (18.20s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (18.20s) before accumulating min_samples (4 < 10)
+Pass: Cold: 4550.733276ms GPU, 4550.766255ms CPU, 18.20s total GPU, 18.20s total wall, 4x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-48.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-48.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-49.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-49.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-50.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-50.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-51.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-51.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-52.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-52.trace)
+Warn: Current measurement timed out (18.24s) before accumulating min_samples (4 < 10)
+Pass: Batch: 4560.543579ms GPU, 18.24s total GPU, 18.24s total wall, 4x
+Run:  [7/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=1]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-53.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-53.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-54.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-54.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-55.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-55.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-56.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-56.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-57.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-57.trace)
+Warn: Current measurement timed out (15.13s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (15.13s) before accumulating min_samples (1 < 10)
+Pass: Cold: 15125.471680ms GPU, 15125.559183ms CPU, 15.13s total GPU, 15.13s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-58.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-58.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-59.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-59.trace)
+Warn: Current measurement timed out (15.29s) before accumulating min_samples (1 < 10)
+Pass: Batch: 15291.513672ms GPU, 15.29s total GPU, 15.29s total wall, 1x
+Run:  [8/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=1]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-60.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-60.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-61.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-61.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-62.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-62.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-63.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-63.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-64.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-64.trace)
+Warn: Current measurement timed out (34.58s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (34.58s) before accumulating min_samples (1 < 10)
+Pass: Cold: 34581.429688ms GPU, 34581.613122ms CPU, 34.58s total GPU, 34.58s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-65.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-65.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-66.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-66.trace)
+Warn: Current measurement timed out (35.25s) before accumulating min_samples (1 < 10)
+Pass: Batch: 35247.433594ms GPU, 35.25s total GPU, 35.25s total wall, 1x
+Run:  [9/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=1]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-67.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-67.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-68.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-68.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-69.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-69.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-70.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-70.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-71.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-71.trace)
+Warn: Current measurement timed out (73.45s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (73.45s) before accumulating min_samples (1 < 10)
+Pass: Cold: 73452.781250ms GPU, 73453.152169ms CPU, 73.45s total GPU, 73.45s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-72.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-72.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-73.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-73.trace)
+Warn: Current measurement timed out (73.60s) before accumulating min_samples (1 < 10)
+Pass: Batch: 73601.210938ms GPU, 73.60s total GPU, 73.60s total wall, 1x
+Run:  [10/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=8 head_size=128 window_left=512 window_right=512 causal=1]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-74.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-74.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-75.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-75.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-76.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-76.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-77.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-77.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-78.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-78.trace)
+Warn: Current measurement timed out (151.52s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (151.52s) before accumulating min_samples (1 < 10)
+Pass: Cold: 151517.453125ms GPU, 151518.203938ms CPU, 151.52s total GPU, 151.52s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-79.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-79.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-80.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-80.trace)
+Warn: Current measurement timed out (151.55s) before accumulating min_samples (1 < 10)
+Pass: Batch: 151553.921875ms GPU, 151.55s total GPU, 151.55s total wall, 1x
+```
+
+# Benchmark Results
+
+## run_mha_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | window_left | window_right | causal |  Q Tensor  |  K Tensor  |  V Tensor  |   Output   | Tokens |  Est. FLOPS  | Memory Usage | Samples | CPU Time  | Noise | GPU Time  | Noise | Elem/s  | GlobalMem BW | BWUtil | Samples | Batch GPU |
+|----------|---------|-----------|--------------|-----------|-------------|--------------|--------|------------|------------|------------|------------|--------|--------------|--------------|---------|-----------|-------|-----------|-------|---------|--------------|--------|---------|-----------|
+|        1 |     512 |        32 |            8 |       128 |         512 |          512 |      0 |  4.000 MiB |  1.000 MiB |  1.000 MiB |  4.000 MiB |    512 |   2147483648 |           10 |      3x |   6.469 s |  inf% |   6.469 s |  inf% |  79.142 |   1.621 MB/s |  0.00% |      3x |   6.437 s |
+|        1 |    1024 |        32 |            8 |       128 |         512 |          512 |      0 |  8.000 MiB |  2.000 MiB |  2.000 MiB |  8.000 MiB |   1024 |   8589934592 |           20 |      1x |  25.249 s |  inf% |  25.249 s |  inf% |  40.556 | 830.594 KB/s |  0.00% |      1x |  25.349 s |
+|        1 |    2048 |        32 |            8 |       128 |         512 |          512 |      0 | 16.000 MiB |  4.000 MiB |  4.000 MiB | 16.000 MiB |   2048 |  34359738368 |           40 |      1x |  58.392 s |  inf% |  58.392 s |  inf% |  35.073 | 718.300 KB/s |  0.00% |      1x |  58.496 s |
+|        1 |    4096 |        32 |            8 |       128 |         512 |          512 |      0 | 32.000 MiB |  8.000 MiB |  8.000 MiB | 32.000 MiB |   4096 | 137438953472 |           80 |      1x | 125.770 s |  inf% | 125.770 s |  inf% |  32.568 | 666.983 KB/s |  0.00% |      1x | 126.040 s |
+|        1 |    8192 |        32 |            8 |       128 |         512 |          512 |      0 | 64.000 MiB | 16.000 MiB | 16.000 MiB | 64.000 MiB |   8192 | 549755813888 |          160 |      1x | 258.784 s |  inf% | 258.783 s |  inf% |  31.656 | 648.312 KB/s |  0.00% |      1x | 258.102 s |
+|        1 |     512 |        32 |            8 |       128 |         512 |          512 |      1 |  4.000 MiB |  1.000 MiB |  1.000 MiB |  4.000 MiB |    512 |   2147483648 |           10 |      4x |   4.551 s |  inf% |   4.551 s |  inf% | 112.509 |   2.304 MB/s |  0.00% |      4x |   4.561 s |
+|        1 |    1024 |        32 |            8 |       128 |         512 |          512 |      1 |  8.000 MiB |  2.000 MiB |  2.000 MiB |  8.000 MiB |   1024 |   8589934592 |           20 |      1x |  15.126 s |  inf% |  15.125 s |  inf% |  67.700 |   1.387 MB/s |  0.00% |      1x |  15.292 s |
+|        1 |    2048 |        32 |            8 |       128 |         512 |          512 |      1 | 16.000 MiB |  4.000 MiB |  4.000 MiB | 16.000 MiB |   2048 |  34359738368 |           40 |      1x |  34.582 s |  inf% |  34.581 s |  inf% |  59.223 |   1.213 MB/s |  0.00% |      1x |  35.247 s |
+|        1 |    4096 |        32 |            8 |       128 |         512 |          512 |      1 | 32.000 MiB |  8.000 MiB |  8.000 MiB | 32.000 MiB |   4096 | 137438953472 |           80 |      1x |  73.453 s |  inf% |  73.453 s |  inf% |  55.764 |   1.142 MB/s |  0.00% |      1x |  73.601 s |
+|        1 |    8192 |        32 |            8 |       128 |         512 |          512 |      1 | 64.000 MiB | 16.000 MiB | 16.000 MiB | 64.000 MiB |   8192 | 549755813888 |          160 |      1x | 151.518 s |  inf% | 151.517 s |  inf% |  54.066 |   1.107 MB/s |  0.00% |      1x | 151.554 s |
+------------- NVBit (NVidia Binary Instrumentation Tool v1.7.4) Loaded --------------
+NVBit core environment variables (mostly for nvbit-devs):
+ACK_CTX_INIT_LIMITATION = 0 - if set, no warning will be printed for nvbit_at_ctx_init()
+            NVDISASM = nvdisasm - override default nvdisasm found in PATH
+            NOBANNER = 0 - if set, does not print this banner
+       NO_EAGER_LOAD = 0 - eager module loading is turned on by NVBit to prevent potential NVBit tool deadlock, turn it off if you want to use the lazy module loading feature
+---------------------------------------------------------------------------------
+         INSTR_BEGIN = 0 - Beginning of the instruction interval where to apply instrumentation
+           INSTR_END = 4294967295 - End of the instruction interval where to apply instrumentation
+    EXCLUDE_PRED_OFF = 1 - Exclude predicated off instruction from count
+      TRACE_LINEINFO = 0 - Include source code line info at the start of each traced line. The target binary must be compiled with -lineinfo or --generate-line-info
+DYNAMIC_KERNEL_LIMIT_END = 0 - Limit of the number kernel to be printed, 0 means no limit
+DYNAMIC_KERNEL_LIMIT_START = 0 - start to report kernel from this kernel id, 0 means starts from the beginning, i.e. first kernel
+   ACTIVE_FROM_START = 1 - Start instruction tracing from start or wait for cuProfilerStart and cuProfilerStop. If set to 0, DYNAMIC_KERNEL_LIMIT options have no effect
+        TOOL_VERBOSE = 0 - Enable verbosity inside the tool
+       TOOL_COMPRESS = 1 - Enable traces compression
+     TOOL_TRACE_CORE = 0 - write the core id in the traces
+TERMINATE_UPON_LIMIT = 0 - Stop the process once the current kernel > DYNAMIC_KERNEL_LIMIT_END
+USER_DEFINED_FOLDERS = 0 - Uses the user defined folder TRACES_FOLDER path environment
+ TRACE_FILE_COMPRESS = 0 - Create xz-compressed tracefile
+WARNING: Do not call CUDA memory allocation in nvbit_at_ctx_init(). It will cause deadlocks. Do them in nvbit_tool_init(). If you encounter deadlocks, remove CUDA API calls to debug.
+----------------------------------------------------------------------------------------------------
+# Devices
+
+## [0] `NVIDIA A30`
+* SM Version: 800 (PTX Version: 800)
+* Number of SMs: 56
+* SM Default Clock Rate: 1440 MHz
+* Global Memory: 23683 MiB Free / 24060 MiB Total
+* Global Memory Bus Peak: 933 GB/sec (3072-bit DDR @1215MHz)
+* Max Shared Memory: 164 KiB/SM, 48 KiB/Block
+* L2 Cache Size: 24576 KiB
+* Maximum Active Blocks: 32/SM
+* Maximum Active Threads: 2048/SM, 1024/Block
+* Available Registers: 65536/SM, 65536/Block
+* ECC Enabled: Yes
+
+# Log
+
+```
+Run:  [1/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=0]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-1.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-1.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-2.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-2.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-3.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-3.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-4.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-4.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-5.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-5.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-6.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-6.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-7.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-7.trace)
+Warn: Current measurement timed out (19.33s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (19.33s) before accumulating min_samples (3 < 10)
+Pass: Cold: 6444.032715ms GPU, 6444.073520ms CPU, 19.33s total GPU, 19.33s total wall, 3x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-8.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-8.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-9.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-9.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-10.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-10.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-11.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-11.trace)
+Warn: Current measurement timed out (19.15s) before accumulating min_samples (3 < 10)
+Pass: Batch: 6384.203776ms GPU, 19.15s total GPU, 19.15s total wall, 3x
+Run:  [2/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=0]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-12.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-12.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-13.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-13.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-14.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-14.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-15.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-15.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-16.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-16.trace)
+Warn: Current measurement timed out (24.29s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (24.29s) before accumulating min_samples (1 < 10)
+Pass: Cold: 24291.722656ms GPU, 24291.852754ms CPU, 24.29s total GPU, 24.29s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-17.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-17.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-18.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-18.trace)
+Warn: Current measurement timed out (24.15s) before accumulating min_samples (1 < 10)
+Pass: Batch: 24150.201172ms GPU, 24.15s total GPU, 24.15s total wall, 1x
+Run:  [3/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=0]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-19.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-19.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-20.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-20.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-21.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-21.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-22.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-22.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-23.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-23.trace)
+Warn: Current measurement timed out (91.83s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (91.83s) before accumulating min_samples (1 < 10)
+Pass: Cold: 91825.867188ms GPU, 91826.335381ms CPU, 91.83s total GPU, 91.83s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-24.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-24.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-25.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-25.trace)
+Warn: Current measurement timed out (92.58s) before accumulating min_samples (1 < 10)
+Pass: Batch: 92577.421875ms GPU, 92.58s total GPU, 92.58s total wall, 1x
+Run:  [4/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=0]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-26.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-26.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-27.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-27.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-28.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-28.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-29.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-29.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-30.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-30.trace)
+Warn: Current measurement timed out (214.17s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (214.17s) before accumulating min_samples (1 < 10)
+Pass: Cold: 214171.781250ms GPU, 214172.894976ms CPU, 214.17s total GPU, 214.17s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-31.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-31.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-32.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-32.trace)
+Warn: Current measurement timed out (214.26s) before accumulating min_samples (1 < 10)
+Pass: Batch: 214260.375000ms GPU, 214.26s total GPU, 214.26s total wall, 1x
+Run:  [5/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=0]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-33.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-33.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-34.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-34.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-35.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-35.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-36.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-36.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-37.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-37.trace)
+Warn: Current measurement timed out (459.85s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (459.85s) before accumulating min_samples (1 < 10)
+Pass: Cold: 459843.062500ms GPU, 459845.452268ms CPU, 459.84s total GPU, 459.85s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-38.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-38.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-39.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-39.trace)
+Warn: Current measurement timed out (459.12s) before accumulating min_samples (1 < 10)
+Pass: Batch: 459118.000000ms GPU, 459.12s total GPU, 459.12s total wall, 1x
+Run:  [6/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=512 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=1]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-40.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-40.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-41.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-41.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-42.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-42.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-43.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-43.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-44.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-44.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-45.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-45.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-46.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-46.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-47.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-47.trace)
+Warn: Current measurement timed out (18.15s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (18.15s) before accumulating min_samples (4 < 10)
+Pass: Cold: 4538.517578ms GPU, 4538.551605ms CPU, 18.15s total GPU, 18.15s total wall, 4x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-48.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-48.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-49.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-49.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-50.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-50.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-51.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-51.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-52.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-52.trace)
+Warn: Current measurement timed out (18.42s) before accumulating min_samples (4 < 10)
+Pass: Batch: 4604.758911ms GPU, 18.42s total GPU, 18.42s total wall, 4x
+Run:  [7/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=1024 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=1]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-53.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-53.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-54.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-54.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-55.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-55.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-56.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-56.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-57.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-57.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-58.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-58.trace)
+Warn: Current measurement timed out (29.52s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (29.52s) before accumulating min_samples (2 < 10)
+Pass: Cold: 14761.058105ms GPU, 14761.144653ms CPU, 29.52s total GPU, 29.52s total wall, 2x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-59.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-59.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-60.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-60.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-61.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-61.trace)
+Warn: Current measurement timed out (29.55s) before accumulating min_samples (2 < 10)
+Pass: Batch: 14772.607422ms GPU, 29.55s total GPU, 29.55s total wall, 2x
+Run:  [8/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=2048 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=1]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-62.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-62.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-63.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-63.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-64.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-64.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-65.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-65.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-66.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-66.trace)
+Warn: Current measurement timed out (51.47s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (51.47s) before accumulating min_samples (1 < 10)
+Pass: Cold: 51465.089844ms GPU, 51465.365304ms CPU, 51.47s total GPU, 51.47s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-67.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-67.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-68.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-68.trace)
+Warn: Current measurement timed out (51.37s) before accumulating min_samples (1 < 10)
+Pass: Batch: 51368.707031ms GPU, 51.37s total GPU, 51.37s total wall, 1x
+Run:  [9/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=4096 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=1]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-69.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-69.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-70.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-70.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-71.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-71.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-72.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-72.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-73.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-73.trace)
+Warn: Current measurement timed out (118.51s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (118.51s) before accumulating min_samples (1 < 10)
+Pass: Cold: 118508.000000ms GPU, 118508.618214ms CPU, 118.51s total GPU, 118.51s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-74.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-74.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-75.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-75.trace)
+Warn: Current measurement timed out (118.60s) before accumulating min_samples (1 < 10)
+Pass: Batch: 118601.429688ms GPU, 118.60s total GPU, 118.60s total wall, 1x
+Run:  [10/10] run_mha_fwd [Device=0 num_seqs=1 seq_len=8192 num_heads=32 num_kv_heads=8 head_size=128 window_left=1024 window_right=1024 causal=1]
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-76.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-76.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-77.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-77.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-78.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-78.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-79.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-79.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-80.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-80.trace)
+Warn: Current measurement timed out (252.91s) while over noise threshold (inf% > 0.50%)
+Warn: Current measurement timed out (252.91s) before accumulating min_samples (1 < 10)
+Pass: Cold: 252912.062500ms GPU, 252913.366754ms CPU, 252.91s total GPU, 252.91s total wall, 1x 
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-81.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-81.trace)
+Writing results to /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-82.trace (memory file /home/accel-sim-framework/util/tracer_nvbit/applications/benchmark_flash_attention/traces//kernel-mem-82.trace)
+Warn: Current measurement timed out (251.27s) before accumulating min_samples (1 < 10)
+Pass: Batch: 251265.296875ms GPU, 251.27s total GPU, 251.27s total wall, 1x
+```
+
+# Benchmark Results
+
+## run_mha_fwd
+
+### [0] NVIDIA A30
+
+| num_seqs | seq_len | num_heads | num_kv_heads | head_size | window_left | window_right | causal |  Q Tensor  |  K Tensor  |  V Tensor  |   Output   | Tokens |  Est. FLOPS  | Memory Usage | Samples | CPU Time  | Noise | GPU Time  | Noise | Elem/s  | GlobalMem BW | BWUtil | Samples | Batch GPU |
+|----------|---------|-----------|--------------|-----------|-------------|--------------|--------|------------|------------|------------|------------|--------|--------------|--------------|---------|-----------|-------|-----------|-------|---------|--------------|--------|---------|-----------|
+|        1 |     512 |        32 |            8 |       128 |        1024 |         1024 |      0 |  4.000 MiB |  1.000 MiB |  1.000 MiB |  4.000 MiB |    512 |   2147483648 |           10 |      3x |   6.444 s |  inf% |   6.444 s |  inf% |  79.453 |   1.627 MB/s |  0.00% |      3x |   6.384 s |
+|        1 |    1024 |        32 |            8 |       128 |        1024 |         1024 |      0 |  8.000 MiB |  2.000 MiB |  2.000 MiB |  8.000 MiB |   1024 |   8589934592 |           20 |      1x |  24.292 s |  inf% |  24.292 s |  inf% |  42.154 | 863.320 KB/s |  0.00% |      1x |  24.150 s |
+|        1 |    2048 |        32 |            8 |       128 |        1024 |         1024 |      0 | 16.000 MiB |  4.000 MiB |  4.000 MiB | 16.000 MiB |   2048 |  34359738368 |           40 |      1x |  91.826 s |  inf% |  91.826 s |  inf% |  22.303 | 456.767 KB/s |  0.00% |      1x |  92.577 s |
+|        1 |    4096 |        32 |            8 |       128 |        1024 |         1024 |      0 | 32.000 MiB |  8.000 MiB |  8.000 MiB | 32.000 MiB |   4096 | 137438953472 |           80 |      1x | 214.173 s |  inf% | 214.172 s |  inf% |  19.125 | 391.677 KB/s |  0.00% |      1x | 214.260 s |
+|        1 |    8192 |        32 |            8 |       128 |        1024 |         1024 |      0 | 64.000 MiB | 16.000 MiB | 16.000 MiB | 64.000 MiB |   8192 | 549755813888 |          160 |      1x | 459.845 s |  inf% | 459.843 s |  inf% |  17.815 | 364.847 KB/s |  0.00% |      1x | 459.118 s |
+|        1 |     512 |        32 |            8 |       128 |        1024 |         1024 |      1 |  4.000 MiB |  1.000 MiB |  1.000 MiB |  4.000 MiB |    512 |   2147483648 |           10 |      4x |   4.539 s |  inf% |   4.539 s |  inf% | 112.812 |   2.310 MB/s |  0.00% |      4x |   4.605 s |
+|        1 |    1024 |        32 |            8 |       128 |        1024 |         1024 |      1 |  8.000 MiB |  2.000 MiB |  2.000 MiB |  8.000 MiB |   1024 |   8589934592 |           20 |      2x |  14.761 s |  inf% |  14.761 s |  inf% |  69.372 |   1.421 MB/s |  0.00% |      2x |  14.773 s |
+|        1 |    2048 |        32 |            8 |       128 |        1024 |         1024 |      1 | 16.000 MiB |  4.000 MiB |  4.000 MiB | 16.000 MiB |   2048 |  34359738368 |           40 |      1x |  51.465 s |  inf% |  51.465 s |  inf% |  39.794 | 814.980 KB/s |  0.00% |      1x |  51.369 s |
+|        1 |    4096 |        32 |            8 |       128 |        1024 |         1024 |      1 | 32.000 MiB |  8.000 MiB |  8.000 MiB | 32.000 MiB |   4096 | 137438953472 |           80 |      1x | 118.509 s |  inf% | 118.508 s |  inf% |  34.563 | 707.852 KB/s |  0.00% |      1x | 118.601 s |
+|        1 |    8192 |        32 |            8 |       128 |        1024 |         1024 |      1 | 64.000 MiB | 16.000 MiB | 16.000 MiB | 64.000 MiB |   8192 | 549755813888 |          160 |      1x | 252.913 s |  inf% | 252.912 s |  inf% |  32.391 | 663.362 KB/s |  0.00% |      1x | 251.265 s |
+
+# Calculate total execution time
+END_TIME=$(date +%s)
+DURATION=$((END_TIME - START_TIME))
+
+# Convert to hours, minutes, seconds
+HOURS=$((DURATION / 3600))
+MINUTES=$(( (DURATION % 3600) / 60 ))
+SECONDS=$((DURATION % 60))
+
+echo ""
+
+echo "=================================================================="
+==================================================================
+echo "                       BENCHMARK SUMMARY                          "
+                       BENCHMARK SUMMARY                          
+echo "=================================================================="
+==================================================================
+echo "Start time: $(date -d @$START_TIME)"
+Start time: Wed Mar  5 15:57:42 UTC 2025
+echo "End time:   $(date -d @$END_TIME)"
+End time:   Wed Mar  5 18:47:55 UTC 2025
+echo "----------------------------------------------------------------"
+----------------------------------------------------------------
+echo "Total execution time: $HOURS hours, $MINUTES minutes, $SECONDS seconds"
+Total execution time: 2 hours, 50 minutes, 13 seconds
+echo "                    = $DURATION seconds"
+                    = 10213 seconds
+echo "----------------------------------------------------------------"
+----------------------------------------------------------------
+echo "GPU used: CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES"
+GPU used: CUDA_VISIBLE_DEVICES=2
+echo "=================================================================="
+==================================================================
+

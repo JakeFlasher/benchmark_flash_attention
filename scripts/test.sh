@@ -45,4 +45,4 @@ sm__warps_active.avg.pct_of_peak_sustained_active \
 --profile-from-start on --export myapp_profile.ncu-rep --force-overwrite --clock-control base --replay-mode kernel ./build/flash_attention_benchmark_kvcache \
   -a num_seqs=$S -a num_heads=$Hqo -a num_kv_heads=$Hkv -a head_size=$D \
   -a page_size=$P -a seq_len=$L -a causal=0 \
-  --disable-blocking-kernel --md "results_kvcache/non-causal.md"
+  --disable-blocking-kernel --md "non-causal.md"
